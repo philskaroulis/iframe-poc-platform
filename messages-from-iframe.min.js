@@ -136,6 +136,11 @@
     };
 
     // ============ AUTO-INITIALIZATION ============
-    // Auto-initialize on script load (can be disabled by calling cleanup)
-    init();
+    // Only initialize if this script is loaded inside an iframe
+    // (not when the partner's page is opened directly in a browser tab)
+    if (window.parent !== window) {
+        init();
+    } else {
+        console.info(LOG_SOURCE + 'Loaded outside iframe (top-level page), initialization skipped');
+    }
 })();
