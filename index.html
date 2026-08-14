@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Activity Monitor POC</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <header>
+        <div class="status-text">INACTIVE</div>
+        <div class="countdown">Seconds to INACTIVE: --s</div>
+    </header>
+
+    <div class="container">
+        <h1>Activity Monitor POC</h1>
+
+        <p class="intro-text">
+            This page monitors user activity in the partner iframe below.
+            Try clicking, typing, scrolling, or moving your mouse inside the iframe.
+        </p>
+
+        <!-- The iframe that will detect user events -->
+        <!-- referrerpolicy="strict-origin" sends the platform's origin to the partner (enables referrer-based trust) -->
+        <iframe
+            id="activity-iframe"
+            title="Partner content iframe for activity tracking"
+            sandbox="allow-scripts"
+            referrerpolicy="strict-origin"
+        ></iframe>
+
+        <div class="info-section">
+            <h2>How This Works</h2>
+            <p>
+                <strong>Parent Page (this page):</strong> Uses fake-usage-meter.js to listen for messages
+                from the iframe and tracks user activity. When activity is detected, the header turns
+                green (ACTIVE). After 10 seconds with no activity, it turns gray (INACTIVE).
+            </p>
+            <p>
+                <strong>Partner Iframe:</strong> Loads messages-from-iframe.js from this platform to detect user events
+                (click, keydown, scroll, mousemove, visibilitychange) and sends them to the platform
+                page using window.parent.postMessage().
+            </p>
+        </div>
+    </div>
+
+    <script src="env-config.js"></script>
+    <script src="ui-manager.js"></script>
+    <script src="fake-usage-meter.js"></script>
+    <script>
+        // ============ ENVIRONMENT-BASED IFRAME LOADING ============
+        const iframe = document.getElementById('activity-iframe');
+
+        // Load appropriate iframe URL based on environment config
+        const VENDOR_URL = window.EnvConfig.get('VENDOR_URL');
+        const PARENT_ORIGIN = window.EnvConfig.get('PARENT_ORIGIN');
+
+        console.log('[App] Environment:', window.EnvConfig.environment);
+        console.log('[App] Loading iframe from:', VENDOR_URL);
+
+        // Handle iframe load success
+        iframe.addEventListener('load', () => {
+            console.log('[App] Iframe loaded successfully');
+
+            // Note: Cross-origin security prevents accessing iframe.contentWindow
+            // from a different origin. The iframe will initialize independently.
+            // Version verification is built into the iframe's init process.
+        });
+
+        // Handle iframe load failure (network error, security error, etc.)
+        iframe.addEventListener('error', (event) => {
+            console.error('[App] Iframe failed to load:', event);
+            console.error('[App] Check vendor URL, CSP headers, and CORS policy');
+            console.error('[App] Vendor URL:', VENDOR_URL);
+        });
+
+        // Set iframe source to trigger load
+        iframe.src = VENDOR_URL;
+    </script>
+</body>
+</html>
