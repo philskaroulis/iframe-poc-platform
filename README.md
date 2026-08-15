@@ -9,20 +9,20 @@
 │    PLATFORM PAGE (index.html)       │
 │  (this repo, e.g., Vercel)          │
 │                                     │
-│  ┌──────────────────────────────┐  │
-│  │  Header (ACTIVE/INACTIVE)    │  │
-│  │  ui-manager.js               │  │
-│  └──────────────────────────────┘  │
+│  ┌──────────────────────────────┐   │
+│  │  Header (ACTIVE/INACTIVE)    │   │
+│  │  ui-manager.js               │   │
+│  └──────────────────────────────┘   │
 │                                     │
-│  ┌──────────────────────────────┐  │
-│  │  Partner Iframe              │  │
-│  │  (cross-origin, GitHub Pages)│  │
-│  └──────────────────────────────┘  │
+│  ┌──────────────────────────────┐   │
+│  │  Partner Iframe              │   │
+│  │  (cross-origin, GitHub Pages)│   │
+│  └──────────────────────────────┘   │
 │                                     │
-│  fake-usage-meter.js:                │
-│  - Validates & routes messages     │
-│  - Enforces rate limits            │
-│  - Manages event handlers          │
+│  fake-usage-meter.js:               │
+│  - Validates & routes messages      │
+│  - Enforces rate limits             │
+│  - Manages event handlers           │
 └─────────────────────────────────────┘
          ▲
          │ postMessage() events
@@ -31,8 +31,8 @@
     │  PARTNER IFRAME       │
     │  (GitHub Pages)       │
     │                       │
-    │ Loads messages-from   │
-    │ -iframe.js from       │
+    │ Loads browser-event-  │
+    │ relay.js from         │
     │ platform by URL       │
     │ (cross-origin script) │
     │                       │
