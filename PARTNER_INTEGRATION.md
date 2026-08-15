@@ -4,7 +4,7 @@ This guide is for developers building content that will be embedded in an iframe
 
 ## Overview
 
-The `browser-event-relay.js` script automatically detects user activity and reports it to the parent page via `postMessage()`. It requires **no configuration** and works out of the box.
+The `partnername-browser-event-relay.js` script automatically detects user activity and reports it to the parent page via `postMessage()`. It requires **no configuration** and works out of the box.
 
 However, if your app is part of a **single-page application**, you should manage the script's lifecycle to prevent memory leaks.
 
@@ -24,7 +24,7 @@ By default, the script auto-initializes when loaded:
   <h1>Welcome to Partner Content</h1>
   
   <!-- Script auto-initializes on load -->
-  <script src="https://cdn.example.com/browser-event-relay.min.js"></script>
+  <script src="https://cdn.example.com/partnername-browser-event-relay.min.js"></script>
 </body>
 </html>
 ```
@@ -198,7 +198,7 @@ The messenger listens for and reports these events:
 | **Visibility** | Tab focus change | None | `IFRAME_VISIBILITY_CHANGE_MESSAGE` |
 
 Each message includes:
-- `source`: `'browser-event-relay'` (identifies the messenger)
+- `source`: `'partnername-browser-event-relay'` (identifies the messenger)
 - `type`: Event type (listed above)
 - `timestamp`: When the event occurred (milliseconds since epoch)
 
@@ -255,14 +255,14 @@ window.UsageMeter.isInitialized()  // Should be true
 <body>
   <div id="app"></div>
   <!-- Load script at end of body -->
-  <script src="browser-event-relay.min.js"></script>
+  <script src="partnername-browser-event-relay.min.js"></script>
 </body>
 ```
 
 Or load dynamically:
 ```javascript
 const script = document.createElement('script');
-script.src = 'https://cdn.example.com/browser-event-relay.min.js';
+script.src = 'https://cdn.example.com/partnername-browser-event-relay.min.js';
 script.onload = () => {
   console.log('Messenger loaded');
   window.BrowserEventRelay.init();

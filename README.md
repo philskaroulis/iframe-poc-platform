@@ -1,6 +1,6 @@
 # iframe-poc-platform
 
-**Part of a two-repo platform/partner `postMessage` POC.** This repo simulates a **platform** that embeds third-party partner content in a cross-origin iframe and monitors user activity inside it. The partner repo (`iframe-poc-partner`) contains the embedded content and is required to load this platform's `browser-event-relay.js` tracking script by reference.
+**Part of a two-repo platform/partner `postMessage` POC.** This repo simulates a **platform** that embeds third-party partner content in a cross-origin iframe and monitors user activity inside it. The partner repo (`iframe-poc-partner`) contains the embedded content and is required to load this platform's `partnername-browser-event-relay.js` tracking script by reference.
 
 ## Architecture
 
@@ -55,12 +55,12 @@
    - Enforces rate limiting via circuit breaker (max 100 events/sec)
    - Routes validated events to registered handlers
    - Updates UI state via `UIManager`
-5. **`browser-event-relay.js`** — the **tracking script that partners are required to embed**. See below.
+5. **`partnername-browser-event-relay.js`** — the **tracking script that partners are required to embed**. See below.
 6. **`env-config.js`** — resolves the partner's URL/origin per environment (dev vs. prod).
 
 ### The Tracking Script
 
-**`browser-event-relay.js`** (production: `.min.js`) is **hosted and distributed by this platform repo**. Partners must load it via `<script src>` in their embedded content (see `iframe-poc-partner` for an example).
+**`partnername-browser-event-relay.js`** (production: `.min.js`) is **hosted and distributed by this platform repo**. Partners must load it via `<script src>` in their embedded content (see `iframe-poc-partner` for an example).
 
 The script:
 - Detects user activity inside the iframe (click, keypress, scroll, mousemove, visibility change)
@@ -68,7 +68,7 @@ The script:
 - Sends minimal, focused messages via `window.parent.postMessage()`:
   ```javascript
   {
-    source: "browser-event-relay",
+    source: "partnername-browser-event-relay",
     type: "IFRAME_CLICK_MESSAGE",    // or IFRAME_KEYPRESS_MESSAGE, IFRAME_SCROLL_MESSAGE, etc.
     timestamp: 1691743200000
   }
@@ -93,7 +93,7 @@ The partner iframe is expected to send messages in this exact format:
 
 The platform validates **every** incoming message via a strict multi-layer check:
 
-1. **Message source** — only messages with `source: "browser-event-relay"` are processed
+1. **Message source** — only messages with `source: "partnername-browser-event-relay"` are processed
 2. **Event type** — only types starting with `IFRAME_` are accepted
 3. **Timestamp deviation** — events with timestamps >5 seconds off the current time are rejected (detects clock-skew or malicious timestamps)
 4. **Origin validation** — message origin must match the configured `PARTNER_ORIGIN` (only the partner can send valid messages)
@@ -169,7 +169,7 @@ window.UsageMeter.setDebug(true);
 
 Output example:
 ```
-[Usage Meter] Message received: {source: "browser-event-relay", type: "IFRAME_CLICK_MESSAGE", timestamp: 1691743200000}
+[Usage Meter] Message received: {source: "partnername-browser-event-relay", type: "IFRAME_CLICK_MESSAGE", timestamp: 1691743200000}
 [Usage Meter] User clicked inside iframe {timestamp: 1691743200000}
 ```
 
@@ -285,8 +285,8 @@ Works in all modern browsers supporting:
 | `ui-manager.js` | Activity state management, countdown timer, header styling |
 | `fake-usage-meter.js` | Message handling, validation, security, rate limiting, event routing |
 | `styles.css` | Styling for platform page |
-| `browser-event-relay.js` | Tracking script (unminified, for development) |
-| `browser-event-relay.min.js` | Tracking script (minified, for production distribution) |
+| `partnername-browser-event-relay.js` | Tracking script (unminified, for development) |
+| `partnername-browser-event-relay.min.js` | Tracking script (minified, for production distribution) |
 | `env-config.js` | Environment detection and partner URL/origin resolution |
 | `PARTNER_INTEGRATION.md` | How partners integrate the platform's tracking script |
 | `SPA_INTEGRATION.md` | How platform SPAs manage lifecycle to prevent memory leaks |
@@ -317,11 +317,11 @@ window.UsageMeter.setDebug(true);
 If no messages appear:
 - Confirm partner script loaded (check `window.BrowserEventRelay`)
 - Confirm partner script is the right version (check `window.BrowserEventRelay.getVersion()`)
-- Confirm partner is sending messages (check partner iframe's console for `[browser-event-relay]` messages)
+- Confirm partner is sending messages (check partner iframe's console for `[partnername-browser-event-relay]` messages)
 
 ### "Cannot read properties of null" or referrer/frameElement errors
 
-**Old code detected.** This repo previously used `window.frameElement.dataset.parentOrigin` which is `null` for cross-origin iframes. If you're using an old version of `browser-event-relay.js`, regenerate from source in this repo — the fix is to derive origin from `document.referrer` instead.
+**Old code detected.** This repo previously used `window.frameElement.dataset.parentOrigin` which is `null` for cross-origin iframes. If you're using an old version of `partnername-browser-event-relay.js`, regenerate from source in this repo — the fix is to derive origin from `document.referrer` instead.
 
 ### Header not changing color
 
