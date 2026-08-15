@@ -4,7 +4,7 @@ This guide is for developers building content that will be embedded in an iframe
 
 ## Overview
 
-The `messages-from-iframe.js` script automatically detects user activity and reports it to the parent page via `postMessage()`. It requires **no configuration** and works out of the box.
+The `browser-event-relay.js` script automatically detects user activity and reports it to the parent page via `postMessage()`. It requires **no configuration** and works out of the box.
 
 However, if your app is part of a **single-page application**, you should manage the script's lifecycle to prevent memory leaks.
 
@@ -24,7 +24,7 @@ By default, the script auto-initializes when loaded:
   <h1>Welcome to Partner Content</h1>
   
   <!-- Script auto-initializes on load -->
-  <script src="https://cdn.example.com/messages-from-iframe.min.js"></script>
+  <script src="https://cdn.example.com/browser-event-relay.min.js"></script>
 </body>
 </html>
 ```
@@ -42,10 +42,10 @@ If your partner app is an SPA (React, Vue, Angular, etc.) and may be mounted/unm
 
 ```javascript
 // When app is about to unmount:
-window.IframeMessenger.cleanup();
+window.BrowserEventRelay.cleanup();
 
 // When app is mounted again:
-window.IframeMessenger.init();
+window.BrowserEventRelay.init();
 ```
 
 ### Framework Examples
@@ -58,13 +58,13 @@ import { useEffect } from 'react';
 export function PartnerApp() {
   useEffect(() => {
     // Ensure initialized when component mounts
-    if (!window.IframeMessenger.isInitialized()) {
-      window.IframeMessenger.init();
+    if (!window.BrowserEventRelay.isInitialized()) {
+      window.BrowserEventRelay.init();
     }
 
     return () => {
       // Cleanup when component unmounts
-      window.IframeMessenger.cleanup();
+      window.BrowserEventRelay.cleanup();
     };
   }, []);
 
@@ -80,14 +80,14 @@ export default {
 
   mounted() {
     // Initialize on mount
-    if (!window.IframeMessenger.isInitialized()) {
-      window.IframeMessenger.init();
+    if (!window.BrowserEventRelay.isInitialized()) {
+      window.BrowserEventRelay.init();
     }
   },
 
   beforeUnmount() {
     // Cleanup on unmount
-    window.IframeMessenger.cleanup();
+    window.BrowserEventRelay.cleanup();
   },
 
   template: '<div>Partner Content</div>'
@@ -106,14 +106,14 @@ import { Component, OnInit, OnDestroy } from '@angular/core';
 export class PartnerComponent implements OnInit, OnDestroy {
   ngOnInit() {
     // Initialize on component creation
-    if (!(window as any).IframeMessenger.isInitialized()) {
-      (window as any).IframeMessenger.init();
+    if (!(window as any).BrowserEventRelay.isInitialized()) {
+      (window as any).BrowserEventRelay.init();
     }
   }
 
   ngOnDestroy() {
     // Cleanup on component destruction
-    (window as any).IframeMessenger.cleanup();
+    (window as any).BrowserEventRelay.cleanup();
   }
 }
 ```
@@ -124,14 +124,14 @@ export class PartnerComponent implements OnInit, OnDestroy {
 class PartnerApp {
   mount() {
     console.log('App mounted');
-    if (!window.IframeMessenger.isInitialized()) {
-      window.IframeMessenger.init();
+    if (!window.BrowserEventRelay.isInitialized()) {
+      window.BrowserEventRelay.init();
     }
   }
 
   unmount() {
     console.log('App unmounting');
-    window.IframeMessenger.cleanup();
+    window.BrowserEventRelay.cleanup();
   }
 }
 
@@ -145,24 +145,24 @@ app.unmount();
 
 ## Public API
 
-### `window.IframeMessenger.init()`
+### `window.BrowserEventRelay.init()`
 
 Initializes the activity messenger. Adds all event listeners.
 
 ```javascript
-window.IframeMessenger.init();
+window.BrowserEventRelay.init();
 ```
 
 - **Effect:** Activates listening for: click, keydown, scroll, mousemove, visibilitychange
 - **Safe to call:** Multiple times (will warn if already initialized but won't duplicate listeners)
 - **Use case:** When your app mounts or resumes
 
-### `window.IframeMessenger.cleanup()`
+### `window.BrowserEventRelay.cleanup()`
 
 Stops listening and removes all event listeners.
 
 ```javascript
-window.IframeMessenger.cleanup();
+window.BrowserEventRelay.cleanup();
 ```
 
 - **Effect:** Removes all listeners, clears internal state
@@ -170,12 +170,12 @@ window.IframeMessenger.cleanup();
 - **Use case:** When your app unmounts or is destroyed
 - **Prevents:** Memory leaks from accumulated listeners
 
-### `window.IframeMessenger.isInitialized()`
+### `window.BrowserEventRelay.isInitialized()`
 
 Check if the messenger is currently active.
 
 ```javascript
-if (window.IframeMessenger.isInitialized()) {
+if (window.BrowserEventRelay.isInitialized()) {
   console.log('Activity messenger is active');
 } else {
   console.log('Activity messenger is inactive');
@@ -200,7 +200,7 @@ The messenger listens for and reports these events:
 | **Visibility** | Tab focus change | None | `IFRAME_VISIBILITY_CHANGE_MESSAGE` |
 
 Each message includes:
-- `source`: `'iframe-messages'` (identifies the messenger)
+- `source`: `'browser-event-relay'` (identifies the messenger)
 - `type`: Event type (listed above)
 - `timestamp`: When the event occurred (milliseconds since epoch)
 
@@ -216,8 +216,8 @@ Each message includes:
 
 **Fix:** Check status before init:
 ```javascript
-if (!window.IframeMessenger.isInitialized()) {
-  window.IframeMessenger.init();
+if (!window.BrowserEventRelay.isInitialized()) {
+  window.BrowserEventRelay.init();
 }
 ```
 
@@ -230,7 +230,7 @@ if (!window.IframeMessenger.isInitialized()) {
 **Fix:** Ensure cleanup in unmount handler:
 ```javascript
 componentWillUnmount() {
-  window.IframeMessenger.cleanup();  // Always cleanup!
+  window.BrowserEventRelay.cleanup();  // Always cleanup!
 }
 ```
 
@@ -248,7 +248,7 @@ window.UsageMeter.isInitialized()  // Should be true
 
 ### Script doesn't load in SPA
 
-**Symptom:** Script doesn't execute, no `window.IframeMessenger` available
+**Symptom:** Script doesn't execute, no `window.BrowserEventRelay` available
 
 **Cause:** Script loaded before DOM ready, or timing issue
 
@@ -257,17 +257,17 @@ window.UsageMeter.isInitialized()  // Should be true
 <body>
   <div id="app"></div>
   <!-- Load script at end of body -->
-  <script src="messages-from-iframe.min.js"></script>
+  <script src="browser-event-relay.min.js"></script>
 </body>
 ```
 
 Or load dynamically:
 ```javascript
 const script = document.createElement('script');
-script.src = 'https://cdn.example.com/messages-from-iframe.min.js';
+script.src = 'https://cdn.example.com/browser-event-relay.min.js';
 script.onload = () => {
   console.log('Messenger loaded');
-  window.IframeMessenger.init();
+  window.BrowserEventRelay.init();
 };
 document.head.appendChild(script);
 ```
@@ -280,7 +280,7 @@ document.head.appendChild(script);
 
 - **Do call `cleanup()` in unmount handlers** — prevents listener accumulation
 - **Do check `isInitialized()` before init** — prevents duplicate initialization warnings
-- **Do wait for script to load** — ensure `window.IframeMessenger` exists before calling
+- **Do wait for script to load** — ensure `window.BrowserEventRelay` exists before calling
 - **Do pass `{ passive: true }` if adding your own listeners** — improves scroll performance
 
 ### ✗ Don't

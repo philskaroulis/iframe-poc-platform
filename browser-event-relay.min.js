@@ -1,4 +1,4 @@
-// Iframe Activity Messenger - Detects and reports user activity to parent
+// Browser Event Relay - Detects and reports user activity to parent
 // Supports lifecycle management to prevent memory leaks in partner apps
 (function() {
     var VERSION = '2.0.0';
@@ -9,10 +9,10 @@
         try {
             PARENT_ORIGIN = new URL(document.referrer).origin;
         } catch (e) {
-            console.error('[iframe-messages] Failed to parse referrer:', e);
+            console.error('[browser-event-relay] Failed to parse referrer:', e);
         }
     }
-    var MESSAGE_SOURCE = 'iframe-messages';
+    var MESSAGE_SOURCE = 'browser-event-relay';
     var LOG_SOURCE = '[' + MESSAGE_SOURCE + '] ';
 
     // Lifecycle state
@@ -128,12 +128,15 @@
     }
 
     // ============ PUBLIC API ============
-    window.IframeMessenger = {
+    window.BrowserEventRelay = {
         init: init,
         cleanup: cleanup,
         isInitialized: isInitialized,
         getVersion: function() { return VERSION; }
     };
+
+    // Backward compatibility alias
+    window.IframeMessenger = window.BrowserEventRelay;
 
     // ============ AUTO-INITIALIZATION ============
     // Only initialize if this script is loaded inside an iframe
