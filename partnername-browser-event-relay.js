@@ -52,19 +52,19 @@
     // ============ NAMED HANDLER FUNCTIONS ============
     // These are stored by reference so they can be removed
     function handleClick() {
-        sendMessageToParent('IFRAME_CLICK_MESSAGE');
+        sendMessageToParent('PARTNER_IFRAME_CLICK_MESSAGE');
     }
 
     function handleKeydown() {
-        sendMessageToParent('IFRAME_KEYPRESS_MESSAGE');
+        sendMessageToParent('PARTNER_IFRAME_KEYPRESS_MESSAGE');
     }
 
     var handleScroll = throttle(function() {
-        sendMessageToParent('IFRAME_SCROLL_MESSAGE');
+        sendMessageToParent('PARTNER_IFRAME_SCROLL_MESSAGE');
     }, 200);
 
     var handleMousemove = throttle(function() {
-        sendMessageToParent('IFRAME_MOUSEMOVE_MESSAGE');
+        sendMessageToParent('PARTNER_IFRAME_MOUSEMOVE_MESSAGE');
     }, 500);
 
     // ============ LIFECYCLE MANAGEMENT ============

@@ -111,19 +111,19 @@
     }
 
     function createDefaultHandlers() {
-        registerEventHandler('IFRAME_CLICK_MESSAGE', (details, eventTimestamp) => {
+        registerEventHandler('PARTNER_IFRAME_CLICK_MESSAGE', (details, eventTimestamp) => {
             log(`Handle click`, { timestamp: eventTimestamp });
         });
 
-        registerEventHandler('IFRAME_KEYPRESS_MESSAGE', (details, eventTimestamp) => {
+        registerEventHandler('PARTNER_IFRAME_KEYPRESS_MESSAGE', (details, eventTimestamp) => {
             log(`Handle keypress`, { timestamp: eventTimestamp });
         });
 
-        registerEventHandler('IFRAME_SCROLL_MESSAGE', (details, eventTimestamp) => {
+        registerEventHandler('PARTNER_IFRAME_SCROLL_MESSAGE', (details, eventTimestamp) => {
             log(`Handle scroll`, { timestamp: eventTimestamp });
         });
 
-        registerEventHandler('IFRAME_MOUSEMOVE_MESSAGE', (details, eventTimestamp) => {
+        registerEventHandler('PARTNER_IFRAME_MOUSEMOVE_MESSAGE', (details, eventTimestamp) => {
             log(`Handle mouse movement`, { timestamp: eventTimestamp });
         });
     }
@@ -166,7 +166,7 @@
             }
 
             // 6. Event type validation
-            if (!type || !type.startsWith('IFRAME_')) {
+            if (!type || !type.startsWith('PARTNER_IFRAME_')) {
                 warn(`Unknown event type: ${type}`);
                 return;
             }

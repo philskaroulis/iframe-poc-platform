@@ -191,10 +191,10 @@ The messenger listens for and reports these events:
 
 | Event | Detection | Throttle | Message Type |
 |-------|-----------|----------|--------------|
-| **Click** | Any click in viewport | None | `IFRAME_CLICK_MESSAGE` |
-| **Typing** | Keydown event | None | `IFRAME_KEYPRESS_MESSAGE` |
-| **Scroll** | Window scroll | 200ms | `IFRAME_SCROLL_MESSAGE` |
-| **Mouse** | Mouse movement | 500ms | `IFRAME_MOUSEMOVE_MESSAGE` |
+| **Click** | Any click in viewport | None | `PARTNER_IFRAME_CLICK_MESSAGE` |
+| **Typing** | Keydown event | None | `PARTNER_IFRAME_KEYPRESS_MESSAGE` |
+| **Scroll** | Window scroll | 200ms | `PARTNER_IFRAME_SCROLL_MESSAGE` |
+| **Mouse** | Mouse movement | 500ms | `PARTNER_IFRAME_MOUSEMOVE_MESSAGE` |
 | **Visibility** | Tab focus change | None | `IFRAME_VISIBILITY_CHANGE_MESSAGE` |
 
 Each message includes:

@@ -69,7 +69,7 @@ The script:
   ```javascript
   {
     source: "partnername-browser-event-relay",
-    type: "IFRAME_CLICK_MESSAGE",    // or IFRAME_KEYPRESS_MESSAGE, IFRAME_SCROLL_MESSAGE, etc.
+    type: "PARTNER_IFRAME_CLICK_MESSAGE",    // or PARTNER_IFRAME_KEYPRESS_MESSAGE, PARTNER_IFRAME_SCROLL_MESSAGE, etc.
     timestamp: 1691743200000
   }
   ```
@@ -84,10 +84,10 @@ The partner iframe is expected to send messages in this exact format:
 
 | Event | Type | Throttle | Notes |
 |-------|------|----------|-------|
-| Click | `IFRAME_CLICK_MESSAGE` | None | Sent every click |
-| Keypress | `IFRAME_KEYPRESS_MESSAGE` | None | Sent on every keydown |
-| Scroll | `IFRAME_SCROLL_MESSAGE` | 200ms | Throttled to 5 events/sec max |
-| Mouse move | `IFRAME_MOUSEMOVE_MESSAGE` | 500ms | Throttled to 2 events/sec max |
+| Click | `PARTNER_IFRAME_CLICK_MESSAGE` | None | Sent every click |
+| Keypress | `PARTNER_IFRAME_KEYPRESS_MESSAGE` | None | Sent on every keydown |
+| Scroll | `PARTNER_IFRAME_SCROLL_MESSAGE` | 200ms | Throttled to 5 events/sec max |
+| Mouse move | `PARTNER_IFRAME_MOUSEMOVE_MESSAGE` | 500ms | Throttled to 2 events/sec max |
 
 ## Security & Validation
 
@@ -169,14 +169,14 @@ window.UsageMeter.setDebug(true);
 
 Output example:
 ```
-[Usage Meter] Message received: {source: "partnername-browser-event-relay", type: "IFRAME_CLICK_MESSAGE", timestamp: 1691743200000}
+[Usage Meter] Message received: {source: "partnername-browser-event-relay", type: "PARTNER_IFRAME_CLICK_MESSAGE", timestamp: 1691743200000}
 [Usage Meter] User clicked inside iframe {timestamp: 1691743200000}
 ```
 
 ### Register Custom Event Handler
 
 ```javascript
-window.UsageMeter.registerHandler('IFRAME_CLICK_MESSAGE', (details, timestamp) => {
+window.UsageMeter.registerHandler('PARTNER_IFRAME_CLICK_MESSAGE', (details, timestamp) => {
   console.log('User clicked in partner iframe', { timestamp });
   // Send to analytics, update database, etc.
 });
