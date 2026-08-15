@@ -136,6 +136,8 @@
     if (window.parent !== window) {
         init();
     } else {
-        console.info(LOG_SOURCE + 'Loaded outside iframe (top-level page), initialization skipped');
+        console.info(LOG_SOURCE + 'Page loaded outside of an iframe (top-level page), so initialization is skipped');
     }
+
+    console.info(LOG_SOURCE + 'Relay script done loading');
 })();
