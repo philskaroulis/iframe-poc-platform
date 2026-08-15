@@ -1,4 +1,4 @@
-// Browser Event Relay - Detects and reports user activity to parent
+// Partner Browser Event Relay - Detects and relays browser events to platform
 // Supports lifecycle management to prevent memory leaks in partner apps
 (function() {
     var VERSION = '2.0.0';

@@ -24,7 +24,7 @@
         <!-- referrerpolicy="strict-origin" sends the platform's origin to the partner (enables referrer-based trust) -->
         <iframe
             id="activity-iframe"
-            title="Partner content iframe for activity tracking"
+            title="Partner content iframe for browser event relaying"
             sandbox="allow-scripts"
             referrerpolicy="strict-origin"
         ></iframe>
@@ -33,7 +33,7 @@
             <h2>How This Works</h2>
             <p>
                 <strong>Parent Page (this page):</strong> Uses fake-usage-meter.js to listen for messages
-                from the iframe and tracks user activity. When activity is detected, the header turns
+                from the iframe and relays browser events. When activity is detected, the header turns
                 green (ACTIVE). After 10 seconds with no activity, it turns gray (INACTIVE).
             </p>
             <p>

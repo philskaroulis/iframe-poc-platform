@@ -1,6 +1,6 @@
 # iframe-poc-platform
 
-**Part of a two-repo platform/partner `postMessage` POC.** This repo simulates a **platform** that embeds third-party partner content in a cross-origin iframe and monitors user activity inside it. The partner repo (`iframe-poc-partner`) contains the embedded content and is required to load this platform's `partnername-browser-event-relay.js` tracking script by reference.
+**Part of a two-repo platform/partner `postMessage` POC.** This repo simulates a **platform** that embeds third-party partner content in a cross-origin iframe and monitors user activity inside it. The partner repo (`iframe-poc-partner`) contains the embedded content and is required to load this platform's `partnername-browser-event-relay.js` event relay script by reference.
 
 ## Architecture
 
@@ -55,10 +55,10 @@
    - Enforces rate limiting via circuit breaker (max 100 events/sec)
    - Routes validated events to registered handlers
    - Updates UI state via `UIManager`
-5. **`partnername-browser-event-relay.js`** — the **tracking script that partners are required to embed**. See below.
+5. **`partnername-browser-event-relay.js`** — the **event relay script that partners are required to embed**. See below.
 6. **`env-config.js`** — resolves the partner's URL/origin per environment (dev vs. prod).
 
-### The Tracking Script
+### The Event Relay Script
 
 **`partnername-browser-event-relay.js`** (production: `.min.js`) is **hosted and distributed by this platform repo**. Partners must load it via `<script src>` in their embedded content (see `iframe-poc-partner` for an example).
 
@@ -288,7 +288,7 @@ Works in all modern browsers supporting:
 | `partnername-browser-event-relay.js` | Tracking script (unminified, for development) |
 | `partnername-browser-event-relay.min.js` | Tracking script (minified, for production distribution) |
 | `env-config.js` | Environment detection and partner URL/origin resolution |
-| `PARTNER_INTEGRATION.md` | How partners integrate the platform's tracking script |
+| `PARTNER_INTEGRATION.md` | How partners integrate the platform's event relay script |
 | `SPA_INTEGRATION.md` | How platform SPAs manage lifecycle to prevent memory leaks |
 
 ## Troubleshooting
@@ -342,7 +342,7 @@ If no messages appear:
 - Passive event listeners for better performance
 - IIFE pattern for namespace isolation
 - Referrer-based origin trust (works cross-origin, no DOM access needed)
-- Minified tracking script (~1KB) for CDN distribution
+- Minified event relay script (~1KB) for CDN distribution
 
 ## License
 
