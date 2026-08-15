@@ -1,4 +1,4 @@
-# Vendor App Integration Guide
+# Partner App Integration Guide
 
 This guide is for developers building content that will be embedded in an iframe with the activity messenger script.
 
@@ -18,10 +18,10 @@ By default, the script auto-initializes when loaded:
 <!DOCTYPE html>
 <html>
 <head>
-  <title>Vendor App</title>
+  <title>Partner App</title>
 </head>
 <body>
-  <h1>Welcome to Vendor Content</h1>
+  <h1>Welcome to Partner Content</h1>
   
   <!-- Script auto-initializes on load -->
   <script src="https://cdn.example.com/messages-from-iframe.min.js"></script>
@@ -38,7 +38,7 @@ The script immediately:
 
 ## Single-Page App: Prevent Memory Leaks
 
-If your vendor app is an SPA (React, Vue, Angular, etc.) and may be mounted/unmounted multiple times, use lifecycle management:
+If your partner app is an SPA (React, Vue, Angular, etc.) and may be mounted/unmounted multiple times, use lifecycle management:
 
 ```javascript
 // When app is about to unmount:
@@ -55,7 +55,7 @@ window.IframeMessenger.init();
 ```javascript
 import { useEffect } from 'react';
 
-export function VendorApp() {
+export function PartnerApp() {
   useEffect(() => {
     // Ensure initialized when component mounts
     if (!window.IframeMessenger.isInitialized()) {
@@ -68,7 +68,7 @@ export function VendorApp() {
     };
   }, []);
 
-  return <div>Vendor Content</div>;
+  return <div>Partner Content</div>;
 }
 ```
 
@@ -76,7 +76,7 @@ export function VendorApp() {
 
 ```javascript
 export default {
-  name: 'VendorApp',
+  name: 'PartnerApp',
 
   mounted() {
     // Initialize on mount
@@ -90,7 +90,7 @@ export default {
     window.IframeMessenger.cleanup();
   },
 
-  template: '<div>Vendor Content</div>'
+  template: '<div>Partner Content</div>'
 };
 ```
 
@@ -100,10 +100,10 @@ export default {
 import { Component, OnInit, OnDestroy } from '@angular/core';
 
 @Component({
-  selector: 'app-vendor',
-  template: '<div>Vendor Content</div>'
+  selector: 'app-partner',
+  template: '<div>Partner Content</div>'
 })
-export class VendorComponent implements OnInit, OnDestroy {
+export class PartnerComponent implements OnInit, OnDestroy {
   ngOnInit() {
     // Initialize on component creation
     if (!(window as any).IframeMessenger.isInitialized()) {
@@ -121,7 +121,7 @@ export class VendorComponent implements OnInit, OnDestroy {
 #### Vanilla JavaScript
 
 ```javascript
-class VendorApp {
+class PartnerApp {
   mount() {
     console.log('App mounted');
     if (!window.IframeMessenger.isInitialized()) {
@@ -135,7 +135,7 @@ class VendorApp {
   }
 }
 
-const app = new VendorApp();
+const app = new PartnerApp();
 app.mount();
 // ... later ...
 app.unmount();
@@ -238,7 +238,7 @@ componentWillUnmount() {
 
 **Symptom:** After calling `cleanup()`, then `init()`, no messages arrive
 
-**Cause:** Parent's message listener needs to be running (parent-side issue, not vendor)
+**Cause:** Parent's message listener needs to be running (parent-side issue, not partner)
 
 **Fix:** Check parent page has its own listeners active:
 ```javascript
@@ -309,6 +309,6 @@ The messenger uses:
 1. **Script loads automatically** — No setup needed for basic usage
 2. **SPA environments need cleanup** — Call `cleanup()` on unmount to prevent leaks
 3. **Simple API** — Just `init()`, `cleanup()`, and `isInitialized()`
-4. **Zero configuration** — Works with any vendor app, no settings needed
+4. **Zero configuration** — Works with any partner app, no settings needed
 
 That's it! The messenger handles all the complexity of detecting activity and reporting it to the parent.

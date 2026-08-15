@@ -1,5 +1,5 @@
 // Iframe Activity Messenger - Detects and reports user activity to parent
-// Supports lifecycle management to prevent memory leaks in vendor apps
+// Supports lifecycle management to prevent memory leaks in partner apps
 (function() {
     var VERSION = '2.0.0';
     // Derive trusted parent origin from document.referrer (works cross-origin)

@@ -14,7 +14,7 @@
     // ============ CONFIGURATION ============
     const CONFIG = {
         MESSAGE_SOURCE: 'iframe-messages',
-        VENDOR_ORIGIN: window.EnvConfig ? window.EnvConfig.get('VENDOR_ORIGIN') : 'https://philskaroulis.github.io',
+        PARTNER_ORIGIN: window.EnvConfig ? window.EnvConfig.get('PARTNER_ORIGIN') : 'https://philskaroulis.github.io',
         DEBUG: false,
         MAX_EVENTS_PER_SECOND: 100,
         MAX_TIMESTAMP_DEVIATION_MS: 5000,
@@ -150,8 +150,8 @@
             }
 
             // 3. Security: Origin validation (CRITICAL - only check after confirming it's our message)
-            if (event.origin !== CONFIG.VENDOR_ORIGIN) {
-                warn(`Message from untrusted origin: ${event.origin} (expected: ${CONFIG.VENDOR_ORIGIN})`);
+            if (event.origin !== CONFIG.PARTNER_ORIGIN) {
+                warn(`Message from untrusted origin: ${event.origin} (expected: ${CONFIG.PARTNER_ORIGIN})`);
                 return;
             }
 
@@ -218,7 +218,7 @@
 
         // Log initialization
         console.log('[Usage Meter] Initialized with:');
-        console.log('  ✓ Origin validation (vendor: ' + CONFIG.VENDOR_ORIGIN + ')');
+        console.log('  ✓ Origin validation (vendor: ' + CONFIG.PARTNER_ORIGIN + ')');
         console.log('  ✓ Message source verification');
         console.log('  ✓ Timestamp validation');
         console.log('  ✓ Rate limiting & circuit breaker');
@@ -267,7 +267,7 @@
             log(`Debug mode ${enabled ? 'enabled' : 'disabled'}`);
         },
         setVendorOrigin: (origin) => {
-            CONFIG.VENDOR_ORIGIN = origin;
+            CONFIG.PARTNER_ORIGIN = origin;
             log(`Vendor origin updated to: ${origin}`);
         },
         getVersion: () => VERSION,

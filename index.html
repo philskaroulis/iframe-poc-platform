@@ -52,11 +52,10 @@
         const iframe = document.getElementById('activity-iframe');
 
         // Load appropriate iframe URL based on environment config
-        const VENDOR_URL = window.EnvConfig.get('VENDOR_URL');
-        const PARENT_ORIGIN = window.EnvConfig.get('PARENT_ORIGIN');
+        const PARTNER_URL = window.EnvConfig.get('PARTNER_URL');
 
         console.log('[App] Environment:', window.EnvConfig.environment);
-        console.log('[App] Loading iframe from:', VENDOR_URL);
+        console.log('[App] Loading iframe from:', PARTNER_URL);
 
         // Handle iframe load success
         iframe.addEventListener('load', () => {
@@ -70,12 +69,12 @@
         // Handle iframe load failure (network error, security error, etc.)
         iframe.addEventListener('error', (event) => {
             console.error('[App] Iframe failed to load:', event);
-            console.error('[App] Check vendor URL, CSP headers, and CORS policy');
-            console.error('[App] Vendor URL:', VENDOR_URL);
+            console.error('[App] Check partner URL, CSP headers, and CORS policy');
+            console.error('[App] Partner URL:', PARTNER_URL);
         });
 
         // Set iframe source to trigger load
-        iframe.src = VENDOR_URL;
+        iframe.src = PARTNER_URL;
     </script>
 </body>
 </html>

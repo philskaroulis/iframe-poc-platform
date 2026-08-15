@@ -74,9 +74,9 @@ The script:
   }
   ```
 - Supports lifecycle management (`init()`, `cleanup()`, `isInitialized()`) for SPAs.
-- Auto-initializes on load but can be manually managed for vendors running single-page apps.
+- Auto-initializes on load but can be manually managed for partners running single-page apps.
 
-See **[VENDOR_INTEGRATION.md](VENDOR_INTEGRATION.md)** for how partners integrate this script into their own content.
+See **[PARTNER_INTEGRATION.md](PARTNER_INTEGRATION.md)** for how partners integrate this script into their own content.
 
 ## Message Contract
 
@@ -97,7 +97,7 @@ The platform validates **every** incoming message via a strict multi-layer check
 1. **Message source** — only messages with `source: "iframe-messages"` are processed
 2. **Event type** — only types starting with `IFRAME_` are accepted
 3. **Timestamp deviation** — events with timestamps >5 seconds off the current time are rejected (detects clock-skew or malicious timestamps)
-4. **Origin validation** — message origin must match the configured `VENDOR_ORIGIN` (only the partner can send valid messages)
+4. **Origin validation** — message origin must match the configured `PARTNER_ORIGIN` (only the partner can send valid messages)
 5. **Rate limiting** — if >100 events arrive in one second, the circuit breaker opens and drops excess messages until the rate normalizes
 
 ## Configuration
@@ -107,12 +107,12 @@ Edit `env-config.js` to change the partner's URL or origin:
 ```javascript
 const ENV_CONFIG = {
     prod: {
-        VENDOR_URL: 'https://...',     // Where the partner's content is hosted
-        VENDOR_ORIGIN: 'https://...'   // Origin to trust for message validation
+        PARTNER_URL: 'https://...',     // Where the partner's content is hosted
+        PARTNER_ORIGIN: 'https://...'   // Origin to trust for message validation
     },
     dev: {
-        VENDOR_URL: 'https://...',
-        VENDOR_ORIGIN: 'https://...'
+        PARTNER_URL: 'https://...',
+        PARTNER_ORIGIN: 'https://...'
     }
 };
 ```
@@ -140,8 +140,8 @@ const ENV_CONFIG = {
 
 3. Set the iframe source:
    ```javascript
-   const VENDOR_URL = window.EnvConfig.get('VENDOR_URL');
-   document.getElementById('activity-iframe').src = VENDOR_URL;
+   const PARTNER_URL = window.EnvConfig.get('PARTNER_URL');
+   document.getElementById('activity-iframe').src = PARTNER_URL;
    ```
 
 ### Lifecycle Management (SPAs)
@@ -223,8 +223,8 @@ python3 -m http.server 8001
 Then update `env-config.js` dev config to:
 ```javascript
 dev: {
-    VENDOR_URL: 'http://localhost:8000/index.html',
-    VENDOR_ORIGIN: 'http://localhost:8000'
+    PARTNER_URL: 'http://localhost:8000/index.html',
+    PARTNER_ORIGIN: 'http://localhost:8000'
 }
 ```
 
@@ -261,8 +261,8 @@ git push origin main
 Update `env-config.js` prod config with your actual Vercel domain:
 ```javascript
 prod: {
-    VENDOR_URL: 'https://philskaroulis.github.io/iframe-poc-partner/index.html',
-    VENDOR_ORIGIN: 'https://philskaroulis.github.io'
+    PARTNER_URL: 'https://philskaroulis.github.io/iframe-poc-partner/index.html',
+    PARTNER_ORIGIN: 'https://philskaroulis.github.io'
 }
 ```
 
@@ -289,7 +289,7 @@ Works in all modern browsers supporting:
 | `messages-from-iframe.js` | Tracking script (unminified, for development) |
 | `messages-from-iframe.min.js` | Tracking script (minified, for production distribution) |
 | `env-config.js` | Environment detection and partner URL/origin resolution |
-| `VENDOR_INTEGRATION.md` | How partners integrate the platform's tracking script |
+| `PARTNER_INTEGRATION.md` | How partners integrate the platform's tracking script |
 | `SPA_INTEGRATION.md` | How platform SPAs manage lifecycle to prevent memory leaks |
 
 ## Troubleshooting

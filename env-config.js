@@ -12,15 +12,15 @@
     const ENV_CONFIG = {
         prod: {
             // Partner's production URL (served from GitHub Pages)
-            VENDOR_URL: 'https://philskaroulis.github.io/iframe-poc-partner/index.html',
+            PARTNER_URL: 'https://philskaroulis.github.io/iframe-poc-partner/index.html',
             // Partner's production origin (for message origin validation)
-            VENDOR_ORIGIN: 'https://philskaroulis.github.io'
+            PARTNER_ORIGIN: 'https://philskaroulis.github.io'
         },
         dev: {
             // Partner's dev/preview URL (also served from GitHub Pages, just the -dev variant)
-            VENDOR_URL: 'https://philskaroulis.github.io/iframe-poc-partner/index-dev.html',
+            PARTNER_URL: 'https://philskaroulis.github.io/iframe-poc-partner/index-dev.html',
             // Partner's origin (same as prod, only the content differs)
-            VENDOR_ORIGIN: 'https://philskaroulis.github.io'
+            PARTNER_ORIGIN: 'https://philskaroulis.github.io'
         }
     };
 
@@ -36,5 +36,5 @@
     };
 
     console.log('[EnvConfig] Initialized for', window.EnvConfig.environment, 'environment');
-    console.log('[EnvConfig] VENDOR_ORIGIN:', activeConfig.VENDOR_ORIGIN);
+    console.log('[EnvConfig] PARTNER_ORIGIN:', activeConfig.PARTNER_ORIGIN);
 })();
