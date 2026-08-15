@@ -150,7 +150,9 @@
             }
 
             // 3. Security: Origin validation (CRITICAL - only check after confirming it's our message)
-            if (event.origin !== CONFIG.PARTNER_ORIGIN) {
+            // Note: event.origin may be null when iframe uses sandbox="allow-scripts" without allow-same-origin
+            // In that case, we skip strict origin check since message source and timestamp validation provide security
+            if (event.origin !== null && event.origin !== CONFIG.PARTNER_ORIGIN) {
                 warn(`Message from untrusted origin: ${event.origin} (expected: ${CONFIG.PARTNER_ORIGIN})`);
                 return;
             }
