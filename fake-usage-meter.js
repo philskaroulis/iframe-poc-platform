@@ -218,7 +218,7 @@
 
         // Log initialization
         console.log('[Usage Meter] Initialized with:');
-        console.log('  ✓ Origin validation (vendor: ' + CONFIG.PARTNER_ORIGIN + ')');
+        console.log('  ✓ Origin validation (partner: ' + CONFIG.PARTNER_ORIGIN + ')');
         console.log('  ✓ Message source verification');
         console.log('  ✓ Timestamp validation');
         console.log('  ✓ Rate limiting & circuit breaker');
