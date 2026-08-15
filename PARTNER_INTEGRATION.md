@@ -30,8 +30,7 @@ By default, the script auto-initializes when loaded:
 ```
 
 The script immediately:
-- ✓ Adds listeners for: click, keydown, scroll, mousemove, visibilitychange
-- ✓ Throttles scroll (200ms) and mousemove (500ms) to reduce noise
+- ✓ Adds listeners for: click, keydown, scroll, mousemove- ✓ Throttles scroll (200ms) and mousemove (500ms) to reduce noise
 - ✓ Sends messages to parent whenever activity is detected
 
 ---
@@ -153,8 +152,7 @@ Initializes the activity messenger. Adds all event listeners.
 window.BrowserEventRelay.init();
 ```
 
-- **Effect:** Activates listening for: click, keydown, scroll, mousemove, visibilitychange
-- **Safe to call:** Multiple times (will warn if already initialized but won't duplicate listeners)
+- **Effect:** Activates listening for: click, keydown, scroll, mousemove- **Safe to call:** Multiple times (will warn if already initialized but won't duplicate listeners)
 - **Use case:** When your app mounts or resumes
 
 ### `window.BrowserEventRelay.cleanup()`

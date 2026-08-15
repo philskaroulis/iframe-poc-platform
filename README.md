@@ -88,7 +88,6 @@ The partner iframe is expected to send messages in this exact format:
 | Keypress | `IFRAME_KEYPRESS_MESSAGE` | None | Sent on every keydown |
 | Scroll | `IFRAME_SCROLL_MESSAGE` | 200ms | Throttled to 5 events/sec max |
 | Mouse move | `IFRAME_MOUSEMOVE_MESSAGE` | 500ms | Throttled to 2 events/sec max |
-| Visibility change | `IFRAME_VISIBILITY_CHANGE_MESSAGE` | None | Sent when page visibility changes |
 
 ## Security & Validation
 

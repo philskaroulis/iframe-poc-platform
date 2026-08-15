@@ -67,10 +67,6 @@
         sendMessageToParent('IFRAME_MOUSEMOVE_MESSAGE');
     }, 500);
 
-    function handleVisibilityChange() {
-        sendMessageToParent('IFRAME_VISIBILITY_CHANGE_MESSAGE');
-    }
-
     // ============ LIFECYCLE MANAGEMENT ============
     function init() {
         if (initialized) {
@@ -93,10 +89,6 @@
         // Register mousemove listener (throttled)
         window.addEventListener('mousemove', handleMousemove, { passive: true });
         listeners.mousemove = { target: window, handler: handleMousemove, options: { passive: true } };
-
-        // Register visibilitychange listener (on document)
-        document.addEventListener('visibilitychange', handleVisibilityChange, { passive: true });
-        listeners.visibilitychange = { target: document, handler: handleVisibilityChange, options: { passive: true } };
 
         initialized = true;
         console.log(LOG_SOURCE + 'Initialized and listening for events');

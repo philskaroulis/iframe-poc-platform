@@ -126,10 +126,6 @@
         registerEventHandler('IFRAME_MOUSEMOVE_MESSAGE', (details, eventTimestamp) => {
             log(`Active mouse movement detected inside iframe`, { timestamp: eventTimestamp });
         });
-
-        registerEventHandler('IFRAME_VISIBILITY_CHANGE_MESSAGE', (details, eventTimestamp) => {
-            log(`iFrame visibility changed`, { timestamp: eventTimestamp });
-        });
     }
 
     // ============ MESSAGE PROCESSING ============
@@ -189,11 +185,7 @@
 
             // 9. Update UI state
             if (window.UIManager) {
-                if (type === 'IFRAME_VISIBILITY_CHANGE_MESSAGE') {
-                    window.UIManager.setInactive();
-                } else {
-                    window.UIManager.setActive();
-                }
+                window.UIManager.setActive();
             }
 
         } catch (e) {
