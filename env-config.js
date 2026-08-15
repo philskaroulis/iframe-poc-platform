@@ -4,23 +4,23 @@
 (function() {
     // ============ ENVIRONMENT DETECTION ============
     // isDevelopment is true on localhost OR on vercel preview deployments
-    const isDevelopment = window.location.hostname.includes('vercel.app') ||
+    const isDevelopment = window.location.hostname.includes('git-develop') ||
                          window.location.hostname === 'localhost';
 
     // ============ CONFIGURATION ============
     // Platform needs to know where the partner's content is hosted and what origin to trust
     const ENV_CONFIG = {
         prod: {
-            // Partner's production URL (served from GitHub Pages)
-            PARTNER_URL: 'https://philskaroulis.github.io/iframe-poc-partner/index.html',
+            // Partner's production URL
+            PARTNER_URL: 'https://iframe-poc-partner.vercel.app/index.html',
             // Partner's production origin (for message origin validation)
-            PARTNER_ORIGIN: 'https://philskaroulis.github.io'
+            PARTNER_ORIGIN: 'https://iframe-poc-partner.vercel.app'
         },
         dev: {
-            // Partner's dev/preview URL (also served from GitHub Pages, just the -dev variant)
-            PARTNER_URL: 'https://philskaroulis.github.io/iframe-poc-partner/index-dev.html',
-            // Partner's origin (same as prod, only the content differs)
-            PARTNER_ORIGIN: 'https://philskaroulis.github.io'
+            // Partner's development URL
+            PARTNER_URL: 'https://iframe-poc-partner-git-develop-phil-skaroulis-projects.vercel.app/index-dev.html',
+            // Partner's development origin (for message origin validation)
+            PARTNER_ORIGIN: 'https://iframe-poc-partner-git-develop-phil-skaroulis-projects.vercel.app'
         }
     };
 
