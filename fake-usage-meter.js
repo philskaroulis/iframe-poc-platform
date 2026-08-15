@@ -112,19 +112,19 @@
 
     function createDefaultHandlers() {
         registerEventHandler('IFRAME_CLICK_MESSAGE', (details, eventTimestamp) => {
-            log(`User clicked inside iframe`, { timestamp: eventTimestamp });
+            log(`Handle click`, { timestamp: eventTimestamp });
         });
 
         registerEventHandler('IFRAME_KEYPRESS_MESSAGE', (details, eventTimestamp) => {
-            log(`User typing detected inside iframe`, { timestamp: eventTimestamp });
+            log(`Handle keypress`, { timestamp: eventTimestamp });
         });
 
         registerEventHandler('IFRAME_SCROLL_MESSAGE', (details, eventTimestamp) => {
-            log(`User scrolled inside iframe`, { timestamp: eventTimestamp });
+            log(`Handle scroll`, { timestamp: eventTimestamp });
         });
 
         registerEventHandler('IFRAME_MOUSEMOVE_MESSAGE', (details, eventTimestamp) => {
-            log(`Active mouse movement detected inside iframe`, { timestamp: eventTimestamp });
+            log(`Handle mouse movement`, { timestamp: eventTimestamp });
         });
     }
 
