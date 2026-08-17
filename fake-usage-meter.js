@@ -264,10 +264,6 @@
             CONFIG.DEBUG = enabled;
             log(`Debug mode ${enabled ? 'enabled' : 'disabled'}`);
         },
-        setVendorOrigin: (origin) => {
-            CONFIG.PARTNER_ORIGIN = origin;
-            log(`Vendor origin updated to: ${origin}`);
-        },
         getVersion: () => VERSION,
         getCircuitBreakerState: () => circuitBreakerState,
         getEventCountThisSecond: () => eventCountThisSecond,
@@ -275,7 +271,6 @@
     };
 
     // ============ AUTO-INITIALIZATION ============
-    // Initialize automatically if configured (default behavior for backward compatibility)
     if (CONFIG.AUTO_INIT) {
         init();
     } else {

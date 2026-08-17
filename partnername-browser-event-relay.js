@@ -127,9 +127,6 @@
         getVersion: function() { return VERSION; }
     };
 
-    // Backward compatibility alias
-    window.IframeMessenger = window.BrowserEventRelay;
-
     // ============ AUTO-INITIALIZATION ============
     // Only initialize if this script is loaded inside an iframe
     // (not when the partner's page is opened directly in a browser tab)
