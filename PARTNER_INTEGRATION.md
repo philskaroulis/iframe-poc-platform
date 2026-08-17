@@ -187,7 +187,7 @@ if (window.BrowserEventRelay.isInitialized()) {
 
 ## Events Detected
 
-The messenger listens for and reports these events:
+The messenger listens for and reports these user interaction events:
 
 | Event | Detection | Throttle | Message Type |
 |-------|-----------|----------|--------------|
@@ -195,7 +195,13 @@ The messenger listens for and reports these events:
 | **Typing** | Keydown event | None | `PARTNER_IFRAME_KEYPRESS_MESSAGE` |
 | **Scroll** | Window scroll | 200ms | `PARTNER_IFRAME_SCROLL_MESSAGE` |
 | **Mouse** | Mouse movement | 500ms | `PARTNER_IFRAME_MOUSEMOVE_MESSAGE` |
-| **Visibility** | Tab focus change | None | `IFRAME_VISIBILITY_CHANGE_MESSAGE` |
+
+The messenger also sends lifecycle messages:
+
+| Event | When | Message Type |
+|-------|------|--------------|
+| **Relay Init** | Relay script binds to events (on `init()` call) | `PARTNER_IFRAME_RELAY_INIT_MESSAGE` |
+| **Relay Cleanup** | Relay script unbinds from events (on `cleanup()` call) | `PARTNER_IFRAME_RELAY_CLEANUP_MESSAGE` |
 
 Each message includes:
 - `source`: `'partnername-browser-event-relay'` (identifies the messenger)

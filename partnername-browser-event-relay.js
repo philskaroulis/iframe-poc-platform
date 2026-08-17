@@ -92,6 +92,19 @@
 
         initialized = true;
         console.log(LOG_SOURCE + 'Initialized and listening for events');
+
+        // Notify platform that relay is now active
+        if (PARENT_ORIGIN) {
+            try {
+                window.parent.postMessage({
+                    source: MESSAGE_SOURCE,
+                    type: 'PARTNER_IFRAME_RELAY_INIT_MESSAGE',
+                    timestamp: Date.now()
+                }, PARENT_ORIGIN);
+            } catch (e) {
+                console.error(LOG_SOURCE + 'Failed to notify platform of init:', e);
+            }
+        }
     }
 
     function cleanup() {
@@ -113,6 +126,19 @@
         initialized = false;
 
         console.log(LOG_SOURCE + 'Cleaned up and stopped listening');
+
+        // Notify platform that relay is now inactive
+        if (PARENT_ORIGIN) {
+            try {
+                window.parent.postMessage({
+                    source: MESSAGE_SOURCE,
+                    type: 'PARTNER_IFRAME_RELAY_CLEANUP_MESSAGE',
+                    timestamp: Date.now()
+                }, PARENT_ORIGIN);
+            } catch (e) {
+                console.error(LOG_SOURCE + 'Failed to notify platform of cleanup:', e);
+            }
+        }
     }
 
     function isInitialized() {

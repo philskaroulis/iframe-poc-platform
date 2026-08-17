@@ -80,7 +80,7 @@ See **[PARTNER_INTEGRATION.md](PARTNER_INTEGRATION.md)** for how partners integr
 
 ## Message Contract
 
-The partner iframe is expected to send messages in this exact format:
+The partner iframe sends messages in this exact format:
 
 | Event | Type | Throttle | Notes |
 |-------|------|----------|-------|
@@ -88,6 +88,8 @@ The partner iframe is expected to send messages in this exact format:
 | Keypress | `PARTNER_IFRAME_KEYPRESS_MESSAGE` | None | Sent on every keydown |
 | Scroll | `PARTNER_IFRAME_SCROLL_MESSAGE` | 200ms | Throttled to 5 events/sec max |
 | Mouse move | `PARTNER_IFRAME_MOUSEMOVE_MESSAGE` | 500ms | Throttled to 2 events/sec max |
+| Relay init | `PARTNER_IFRAME_RELAY_INIT_MESSAGE` | None | Sent when relay script binds to events |
+| Relay cleanup | `PARTNER_IFRAME_RELAY_CLEANUP_MESSAGE` | None | Sent when relay script unbinds from events |
 
 ## Security & Validation
 
@@ -179,6 +181,15 @@ Output example:
 window.UsageMeter.registerHandler('PARTNER_IFRAME_CLICK_MESSAGE', (details, timestamp) => {
   console.log('User clicked in partner iframe', { timestamp });
   // Send to analytics, update database, etc.
+});
+
+// Also handle relay lifecycle events
+window.UsageMeter.registerHandler('PARTNER_IFRAME_RELAY_INIT_MESSAGE', (details, timestamp) => {
+  console.log('Relay script initialized', { timestamp });
+});
+
+window.UsageMeter.registerHandler('PARTNER_IFRAME_RELAY_CLEANUP_MESSAGE', (details, timestamp) => {
+  console.log('Relay script cleaned up', { timestamp });
 });
 ```
 

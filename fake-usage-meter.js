@@ -126,6 +126,14 @@
         registerEventHandler('PARTNER_IFRAME_MOUSEMOVE_MESSAGE', (details, eventTimestamp) => {
             log(`Handle mouse movement`, { timestamp: eventTimestamp });
         });
+
+        registerEventHandler('PARTNER_IFRAME_RELAY_INIT_MESSAGE', (details, eventTimestamp) => {
+            log(`Relay script initialized and bound to events`, { timestamp: eventTimestamp });
+        });
+
+        registerEventHandler('PARTNER_IFRAME_RELAY_CLEANUP_MESSAGE', (details, eventTimestamp) => {
+            log(`Relay script cleaned up and unbound from events`, { timestamp: eventTimestamp });
+        });
     }
 
     // ============ MESSAGE PROCESSING ============
