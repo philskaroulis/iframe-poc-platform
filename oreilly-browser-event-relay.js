@@ -9,11 +9,23 @@
         try {
             PARENT_ORIGIN = new URL(document.referrer).origin;
         } catch (e) {
-            console.error('[partnername-browser-event-relay] Failed to parse referrer:', e);
+            console.error('[oreilly-browser-event-relay] Failed to parse referrer:', e);
         }
     }
-    var MESSAGE_SOURCE = 'partnername-browser-event-relay';
+    var MESSAGE_SOURCE = 'oreilly-browser-event-relay';
     var LOG_SOURCE = '[' + MESSAGE_SOURCE + '] ';
+
+    // Retrieve iframe ID from URL parameters
+    var IFRAME_ID = null;
+    try {
+        var urlParams = new URLSearchParams(window.location.search);
+        IFRAME_ID = urlParams.get('iframeId');
+        if (IFRAME_ID) {
+            console.log(LOG_SOURCE + 'Iframe ID initialized:', IFRAME_ID);
+        }
+    } catch (e) {
+        console.warn(LOG_SOURCE + 'Failed to parse iframe ID from URL:', e);
+    }
 
     // Lifecycle state
     var initialized = false;
@@ -26,11 +38,13 @@
             return;
         }
         try {
-            window.parent.postMessage({
+            var message = {
                 source: MESSAGE_SOURCE,
                 type: eventType,
-                timestamp: Date.now()
-            }, PARENT_ORIGIN);
+                timestamp: Date.now(),
+                iframeId: IFRAME_ID
+            };
+            window.parent.postMessage(message, PARENT_ORIGIN);
         } catch (e) {
             console.error(LOG_SOURCE + 'Failed to postMessage to parent:', e);
         }
@@ -52,19 +66,19 @@
     // ============ NAMED HANDLER FUNCTIONS ============
     // These are stored by reference so they can be removed
     function handleClick() {
-        sendMessageToParent('PARTNER_IFRAME_CLICK_MESSAGE');
+        sendMessageToParent('RELAYED_CLICK');
     }
 
     function handleKeydown() {
-        sendMessageToParent('PARTNER_IFRAME_KEYPRESS_MESSAGE');
+        sendMessageToParent('RELAYED_KEYPRESS');
     }
 
     var handleScroll = throttle(function() {
-        sendMessageToParent('PARTNER_IFRAME_SCROLL_MESSAGE');
+        sendMessageToParent('RELAYED_SCROLL');
     }, 200);
 
     var handleMousemove = throttle(function() {
-        sendMessageToParent('PARTNER_IFRAME_MOUSEMOVE_MESSAGE');
+        sendMessageToParent('RELAYED_MOUSEMOVE');
     }, 500);
 
     // ============ LIFECYCLE MANAGEMENT ============
@@ -96,11 +110,15 @@
         // Notify platform that relay is now active
         if (PARENT_ORIGIN) {
             try {
-                window.parent.postMessage({
+                var initMessage = {
                     source: MESSAGE_SOURCE,
-                    type: 'PARTNER_IFRAME_RELAY_INIT_MESSAGE',
+                    type: 'RELAYED_INIT',
                     timestamp: Date.now()
-                }, PARENT_ORIGIN);
+                };
+                if (IFRAME_ID) {
+                    initMessage.iframeId = IFRAME_ID;
+                }
+                window.parent.postMessage(initMessage, PARENT_ORIGIN);
             } catch (e) {
                 console.error(LOG_SOURCE + 'Failed to notify platform of init:', e);
             }
@@ -130,11 +148,15 @@
         // Notify platform that relay is now inactive
         if (PARENT_ORIGIN) {
             try {
-                window.parent.postMessage({
+                var cleanupMessage = {
                     source: MESSAGE_SOURCE,
-                    type: 'PARTNER_IFRAME_RELAY_CLEANUP_MESSAGE',
+                    type: 'RELAYED_CLEANUP',
                     timestamp: Date.now()
-                }, PARENT_ORIGIN);
+                };
+                if (IFRAME_ID) {
+                    cleanupMessage.iframeId = IFRAME_ID;
+                }
+                window.parent.postMessage(cleanupMessage, PARENT_ORIGIN);
             } catch (e) {
                 console.error(LOG_SOURCE + 'Failed to notify platform of cleanup:', e);
             }

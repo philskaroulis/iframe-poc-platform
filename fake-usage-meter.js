@@ -13,7 +13,7 @@
 
     // ============ CONFIGURATION ============
     const CONFIG = {
-        MESSAGE_SOURCE: 'partnername-browser-event-relay',
+        MESSAGE_SOURCE: 'oreilly-browser-event-relay',
         PARTNER_ORIGIN: window.EnvConfig ? window.EnvConfig.get('PARTNER_ORIGIN') : 'https://philskaroulis.github.io',
         DEBUG: false,
         MAX_EVENTS_PER_SECOND: 100,
@@ -111,27 +111,27 @@
     }
 
     function createDefaultHandlers() {
-        registerEventHandler('PARTNER_IFRAME_CLICK_MESSAGE', (details, eventTimestamp) => {
+        registerEventHandler('RELAYED_CLICK', (details, eventTimestamp) => {
             log(`Handle click`, { timestamp: eventTimestamp });
         });
 
-        registerEventHandler('PARTNER_IFRAME_KEYPRESS_MESSAGE', (details, eventTimestamp) => {
+        registerEventHandler('RELAYED_KEYPRESS', (details, eventTimestamp) => {
             log(`Handle keypress`, { timestamp: eventTimestamp });
         });
 
-        registerEventHandler('PARTNER_IFRAME_SCROLL_MESSAGE', (details, eventTimestamp) => {
+        registerEventHandler('RELAYED_SCROLL', (details, eventTimestamp) => {
             log(`Handle scroll`, { timestamp: eventTimestamp });
         });
 
-        registerEventHandler('PARTNER_IFRAME_MOUSEMOVE_MESSAGE', (details, eventTimestamp) => {
+        registerEventHandler('RELAYED_MOUSEMOVE', (details, eventTimestamp) => {
             log(`Handle mouse movement`, { timestamp: eventTimestamp });
         });
 
-        registerEventHandler('PARTNER_IFRAME_RELAY_INIT_MESSAGE', (details, eventTimestamp) => {
+        registerEventHandler('RELAYED_INIT', (details, eventTimestamp) => {
             log(`Relay script initialized and bound to events`, { timestamp: eventTimestamp });
         });
 
-        registerEventHandler('PARTNER_IFRAME_RELAY_CLEANUP_MESSAGE', (details, eventTimestamp) => {
+        registerEventHandler('RELAYED_CLEANUP', (details, eventTimestamp) => {
             log(`Relay script cleaned up and unbound from events`, { timestamp: eventTimestamp });
         });
     }
@@ -153,39 +153,46 @@
                 return;
             }
 
-            // 3. Origin validation: NOT PERFORMED
+            // 3. Relay token validation (verify message comes from expected iframe)
+            if (event.data.iframeId !== window.appIframeId) {
+                warn(`Message from unexpected iframe ID: ${event.data.iframeId}`);
+                return;
+            }
+
+            // 5. Origin validation: NOT PERFORMED
             // Why not? The iframe uses sandbox="allow-scripts" without "allow-same-origin",
             // which strips the origin to null/undefined. This is intentional for security:
             //
             // 1. Origin is not a meaningful validation boundary when iframe is sandboxed
             // 2. Message source validation (step 2) is our primary security gate
-            // 3. Timestamp validation (step 5) prevents replay/spoofed events
-            // 4. Together, these are sufficient for our threat model
+            // 3. Relay token validation (step 3) ensures message comes from expected iframe
+            // 4. Timestamp validation (step 6) prevents replay/spoofed events
+            // 5. Together, these are sufficient for our threat model
             //
             // If sandbox attribute changes to include "allow-same-origin", origin becomes
-            // meaningful and should be validated. For now, we rely on message source + timestamp.
+            // meaningful and should be validated. For now, we rely on message source + token + timestamp.
 
-            // 4. Extract and validate data
+            // 6. Extract and validate data
             const { type, timestamp: eventTimestamp, ...details } = event.data;
 
-            // 5. Timestamp validation
+            // 7. Timestamp validation
             if (!validateTimestamp(eventTimestamp)) {
                 return;
             }
 
-            // 6. Event type validation
-            if (!type || !type.startsWith('PARTNER_IFRAME_')) {
+            // 8. Event type validation
+            if (!type || !type.startsWith('RELAYED_')) {
                 warn(`Unknown event type: ${type}`);
                 return;
             }
 
-            // 7. Rate limiting / Circuit breaker
+            // 9. Rate limiting / Circuit breaker
             if (!checkRateLimit()) {
                 log(`Message dropped - circuit breaker OPEN or rate limit exceeded`);
                 return;
             }
 
-            // 8. Route to handler
+            // 10. Route to handler
             const handler = eventHandlers.get(type);
             if (handler) {
                 handler(details, eventTimestamp);
@@ -193,7 +200,7 @@
                 warn(`No handler registered for event type: ${type}`);
             }
 
-            // 9. Update UI state
+            // 11. Update UI state
             if (window.UIManager) {
                 window.UIManager.setActive();
             }

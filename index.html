@@ -37,7 +37,7 @@
                 green (ACTIVE). After 10 seconds with no activity, it turns gray (INACTIVE).
             </p>
             <p>
-                <strong>Partner Iframe:</strong> Loads partnername-browser-event-relay.js from this platform to detect user events
+                <strong>Partner Iframe:</strong> Loads oreilly-browser-event-relay.js from this platform to detect user events
                 (click, keydown, scroll, mousemove, visibilitychange) and sends them to the platform
                 page using window.parent.postMessage().
             </p>
@@ -53,6 +53,11 @@
 
         // Load appropriate iframe URL based on environment config
         const PARTNER_URL = window.EnvConfig.get('PARTNER_URL');
+
+        // Generate unique relay token for this iframe
+        const iframeId = crypto.randomUUID();
+        window.appIframeId = iframeId; // Store for access by other scripts
+        console.log('[App] Generated relay token:', iframeId);
 
         console.log('[App] Environment:', window.EnvConfig.environment);
         console.log('[App] Loading iframe from:', PARTNER_URL);
@@ -73,8 +78,10 @@
             console.error('[App] Partner URL:', PARTNER_URL);
         });
 
-        // Set iframe source to trigger load
-        iframe.src = PARTNER_URL;
+        // Set iframe source with relay token as URL parameter
+        const partnerUrlWithToken = new URL(PARTNER_URL, window.location.origin);
+        partnerUrlWithToken.searchParams.set('iframeId', iframeId);
+        iframe.src = partnerUrlWithToken.toString();
     </script>
 </body>
 </html>

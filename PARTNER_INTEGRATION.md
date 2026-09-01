@@ -4,7 +4,7 @@ This guide is for developers building content that will be embedded in an iframe
 
 ## Overview
 
-The `partnername-browser-event-relay.js` script automatically detects user activity and reports it to the parent page via `postMessage()`. It requires **no configuration** and works out of the box.
+The `oreilly-browser-event-relay.js` script automatically detects user activity and reports it to the parent page via `postMessage()`. It requires **no configuration** and works out of the box.
 
 However, if your app is part of a **single-page application**, you should manage the script's lifecycle to prevent memory leaks.
 
@@ -24,7 +24,7 @@ By default, the script auto-initializes when loaded:
   <h1>Welcome to Partner Content</h1>
   
   <!-- Script auto-initializes on load -->
-  <script src="https://cdn.example.com/partnername-browser-event-relay.min.js"></script>
+  <script src="https://cdn.example.com/oreilly-browser-event-relay.min.js"></script>
 </body>
 </html>
 ```
@@ -191,20 +191,20 @@ The messenger listens for and reports these user interaction events:
 
 | Event | Detection | Throttle | Message Type |
 |-------|-----------|----------|--------------|
-| **Click** | Any click in viewport | None | `PARTNER_IFRAME_CLICK_MESSAGE` |
-| **Typing** | Keydown event | None | `PARTNER_IFRAME_KEYPRESS_MESSAGE` |
-| **Scroll** | Window scroll | 200ms | `PARTNER_IFRAME_SCROLL_MESSAGE` |
-| **Mouse** | Mouse movement | 500ms | `PARTNER_IFRAME_MOUSEMOVE_MESSAGE` |
+| **Click** | Any click in viewport | None | `RELAYED_CLICK` |
+| **Typing** | Keydown event | None | `RELAYED_KEYPRESS` |
+| **Scroll** | Window scroll | 200ms | `RELAYED_SCROLL` |
+| **Mouse** | Mouse movement | 500ms | `RELAYED_MOUSEMOVE` |
 
 The messenger also sends lifecycle messages:
 
 | Event | When | Message Type |
 |-------|------|--------------|
-| **Relay Init** | Relay script binds to events (on `init()` call) | `PARTNER_IFRAME_RELAY_INIT_MESSAGE` |
-| **Relay Cleanup** | Relay script unbinds from events (on `cleanup()` call) | `PARTNER_IFRAME_RELAY_CLEANUP_MESSAGE` |
+| **Relay Init** | Relay script binds to events (on `init()` call) | `RELAYED_INIT` |
+| **Relay Cleanup** | Relay script unbinds from events (on `cleanup()` call) | `RELAYED_CLEANUP` |
 
 Each message includes:
-- `source`: `'partnername-browser-event-relay'` (identifies the messenger)
+- `source`: `'oreilly-browser-event-relay'` (identifies the messenger)
 - `type`: Event type (listed above)
 - `timestamp`: When the event occurred (milliseconds since epoch)
 
@@ -261,14 +261,14 @@ window.UsageMeter.isInitialized()  // Should be true
 <body>
   <div id="app"></div>
   <!-- Load script at end of body -->
-  <script src="partnername-browser-event-relay.min.js"></script>
+  <script src="oreilly-browser-event-relay.min.js"></script>
 </body>
 ```
 
 Or load dynamically:
 ```javascript
 const script = document.createElement('script');
-script.src = 'https://cdn.example.com/partnername-browser-event-relay.min.js';
+script.src = 'https://cdn.example.com/oreilly-browser-event-relay.min.js';
 script.onload = () => {
   console.log('Messenger loaded');
   window.BrowserEventRelay.init();
