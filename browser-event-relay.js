@@ -20,13 +20,26 @@
  */
 
 (function() {
-    // VERSION exposed via getVersion() API for cache debugging.
-    // Partners' browsers cache this script; when platform deploys updates,
-    // cached versions may persist for hours/days. getVersion() helps diagnose
-    // "is the partner on the old or new code?" during troubleshooting.
+    // VERSION: Semantic version for understanding what's in each release.
+    // BUILT_AT: ISO timestamp injected at build time to diagnose cache staleness.
+    //
+    // When partners report issues, these help diagnose stale cached code:
+    // - VERSION tells what features/fixes are in a release
+    // - BUILT_AT tells if their cached version is days old (clear cache if needed)
+    //
+    // In production, replace BUILT_AT with timestamp from build process.
+    // Example: `node -e "console.log(new Date().toISOString())"`
     var VERSION = '2.0.0';
+    var BUILT_AT = '2025-01-09T14:30:00Z';
     var MESSAGE_SOURCE = 'browser-event-relay';
     var LOG_SOURCE = '[' + MESSAGE_SOURCE + '] ';
+    var DEBUG = false;
+
+    function log(message) {
+        if (DEBUG) {
+            console.log(LOG_SOURCE + message);
+        }
+    }
 
     // ============ IE COMPATIBILITY: URL PARSING ============
     // This section handles browser incompatibilities with modern URL APIs
@@ -89,7 +102,7 @@
     // Retrieve iframe ID from URL parameters (relay token for iframe isolation)
     var IFRAME_ID = getUrlParameter('iframeId');
     if (IFRAME_ID) {
-        console.log(LOG_SOURCE + 'Iframe ID initialized:', IFRAME_ID);
+        log('Iframe ID initialized: ' + IFRAME_ID);
     }
 
     // Lifecycle state
@@ -191,7 +204,7 @@
         addListenerWithoutOptions(window, 'mousemove', handleMousemove);
 
         initialized = true;
-        console.log(LOG_SOURCE + 'Initialized and listening for events');
+        log('Initialized and listening for events');
 
         // Notify platform that relay is now active
         if (PARENT_ORIGIN) {
@@ -199,7 +212,9 @@
                 var initMessage = {
                     source: MESSAGE_SOURCE,
                     type: 'RELAYED_INIT',
-                    timestamp: Date.now()
+                    timestamp: Date.now(),
+                    version: VERSION,
+                    builtAt: BUILT_AT
                 };
                 if (IFRAME_ID) {
                     initMessage.iframeId = IFRAME_ID;
@@ -213,7 +228,7 @@
 
     function cleanup() {
         if (!initialized) {
-            console.log(LOG_SOURCE + 'Not initialized, nothing to clean up');
+            log('Not initialized, nothing to clean up');
             return;
         }
 
@@ -229,7 +244,7 @@
         listeners = {};
         initialized = false;
 
-        console.log(LOG_SOURCE + 'Cleaned up and stopped listening');
+        log('Cleaned up and stopped listening');
 
         // Notify platform that relay is now inactive
         if (PARENT_ORIGIN) {
@@ -258,7 +273,15 @@
         init: init,
         cleanup: cleanup,
         isInitialized: isInitialized,
-        getVersion: function() { return VERSION; }
+        version: function() {
+            return {
+                version: VERSION,
+                builtAt: BUILT_AT
+            };
+        },
+        setDebug: function(enabled) {
+            DEBUG = enabled;
+        }
     };
 
     // ============ AUTO-INITIALIZATION ============
@@ -267,8 +290,8 @@
     if (window.parent !== window) {
         init();
     } else {
-        console.info(LOG_SOURCE + 'Page loaded outside of an iframe (top-level page), so initialization is skipped');
+        log('Page loaded outside of an iframe (top-level page), so initialization is skipped');
     }
 
-    console.info(LOG_SOURCE + 'Relay script done loading');
+    log('Relay script done loading');
 })();

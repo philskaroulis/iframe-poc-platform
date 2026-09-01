@@ -47,19 +47,23 @@ The script immediately:
 
 ## The BrowserEventRelay Object
 
-Once the script loads, it exposes a global object called `window.BrowserEventRelay`. This object provides methods to check the relay's status and manage its lifecycle.
+Once the script loads, it exposes a global object called `window.BrowserEventRelay`. This object provides methods to manage the relay's lifecycle and access version information.
 
 ```javascript
 // The relay script creates this global object
 window.BrowserEventRelay = {
+  // Lifecycle management
   init(),              // Start listening for events
   cleanup(),           // Stop listening and remove listeners
   isInitialized(),     // Check if currently active
-  getVersion()         // Get script version
+  
+  // Debugging & diagnostics
+  setDebug(enabled),   // Enable/disable console logging
+  version()            // Get { version, builtAt } object for diagnostics
 };
 ```
 
-In most partner apps, **you don't need to call these methods**. The script auto-initializes on load and relays events automatically. Only use these if you're building a single-page app that manages lifecycle, or when troubleshooting issues.
+In most partner apps, **you don't need to call these methods**. The script auto-initializes on load and relays events automatically. Only use these if you're building a single-page app that manages lifecycle, or when troubleshooting issues with platform support.
 
 ---
 
@@ -105,16 +109,53 @@ if (window.BrowserEventRelay.isInitialized()) {
 - **Returns:** Boolean (true if initialized, false otherwise)
 - **Use case:** Conditional initialization logic
 
-### `window.BrowserEventRelay.getVersion()`
+### `window.BrowserEventRelay.setDebug(enabled)`
 
-Get the script version (useful when troubleshooting issues with platform support).
+Enable or disable debug logging to the browser console.
 
 ```javascript
-console.log(window.BrowserEventRelay.getVersion());  // → "2.0.0"
+// Enable debug logging
+window.BrowserEventRelay.setDebug(true);
+
+// Now the relay script will log to console:
+// [browser-event-relay] Initialized and listening for events
+// [browser-event-relay] Cleaned up and stopped listening
+// etc.
+
+// Disable debug logging
+window.BrowserEventRelay.setDebug(false);
 ```
 
-- **Returns:** String (e.g., "2.0.0")
-- **Use case:** When reporting issues to the platform, include your script version to help diagnose if you're running an outdated cached version
+- **Parameter:** `enabled` (Boolean) — true to enable, false to disable
+- **Use case:** Troubleshooting — enable during debugging, disable in production
+- **Default:** false (logs disabled)
+- **Note:** Error messages (console.error) are always logged regardless of debug setting
+
+---
+
+### `window.BrowserEventRelay.version()`
+
+Get version and build information for diagnostics.
+
+```javascript
+console.log(window.BrowserEventRelay.version());
+// → { version: "2.0.0", builtAt: "2025-01-09T14:30:00Z" }
+
+// Or access individual fields:
+const info = window.BrowserEventRelay.version();
+console.log(info.version);   // "2.0.0"
+console.log(info.builtAt);   // "2025-01-09T14:30:00Z"
+```
+
+**Returns:** Object with fields:
+
+- **`version`** (String) — Semantic version (e.g., "2.0.0")
+  - Use case: When reporting issues, tells the platform what features are available
+  - Describes what's changed: `major.minor.patch` (breaking.feature.bugfix)
+
+- **`builtAt`** (ISO 8601 String) — Build timestamp (e.g., "2025-01-09T14:30:00Z")
+  - Use case: Diagnose cache staleness. If it's several days old and you're seeing issues after a platform update, clear your browser cache
+  - Tells you exactly when the script was built/deployed
 
 ---
 
@@ -157,7 +198,10 @@ After the script loads, verify it's working:
 if (typeof window.BrowserEventRelay === 'undefined') {
   console.error('Script failed to load');
 } else {
-  console.log('✓ Script loaded, version:', window.BrowserEventRelay.getVersion());
+  console.log('✓ Script loaded');
+  const info = window.BrowserEventRelay.version();
+  console.log('  Version:', info.version);
+  console.log('  Built:', info.builtAt);
 }
 
 // 2. Check initialization status
@@ -398,16 +442,31 @@ document.head.appendChild(script);
 
 **Cause:** Your browser cached the old script version; new version hasn't been fetched yet
 
-**Fix:** Hard-refresh your page to bypass browser cache:
-- **Mac:** Cmd+Shift+R
-- **Windows:** Ctrl+Shift+R
-
-Then verify you have the latest version:
+**Diagnosis:** Check your script's version and build date:
 ```javascript
-window.BrowserEventRelay.getVersion()  // Check script version in console
+// In partner iframe console:
+console.log(window.BrowserEventRelay.version());
+
+// Example output:
+// { version: "2.0.0", builtAt: "2025-01-06T10:15:00Z" }
+//                                  ↑ 3+ days old, likely stale
 ```
 
-If the version hasn't changed after hard-refresh, the CDN may still be serving the old version. Wait a few minutes and try again, or clear your browser cache entirely.
+**Fix:** 
+
+1. **Hard-refresh your page** to bypass browser cache:
+   - **Mac:** Cmd+Shift+R
+   - **Windows:** Ctrl+Shift+R
+
+2. **Verify the new version loaded:**
+   ```javascript
+   window.BrowserEventRelay.version().builtAt  // Should show today's date now
+   ```
+
+3. **If still seeing old timestamp after hard-refresh:**
+   - CDN cache may not have expired yet, or
+   - Your ISP/network is caching aggressively
+   - Try: Clear browser cache entirely, or wait 1-2 hours for CDN to update
 
 ---
 
@@ -428,6 +487,37 @@ If the version hasn't changed after hard-refresh, the CDN may still be serving t
 - **Don't assume multiple `init()` calls are safe** — they'll log warnings and potentially duplicate listeners
 - **Don't manually add your own click/scroll/etc listeners** — they'll duplicate activity messages and bog down performance
 - **Don't try to change which events are detected** — the relay script listens for a fixed set of events determined by the platform
+
+---
+
+## Build Process: Injecting Timestamps
+
+The `BUILT_AT` timestamp in the script should be automatically injected during your build process. This ensures every release has an accurate build time for cache diagnostics.
+
+### Example Build Integration
+
+In your build script (e.g., `package.json` or CI pipeline):
+
+```bash
+# Generate current ISO timestamp
+BUILT_AT=$(node -e "console.log(new Date().toISOString())")
+
+# Replace placeholder in script
+sed -i "s/var BUILT_AT = '.*'/var BUILT_AT = '$BUILT_AT'/" browser-event-relay.js
+
+# Then minify/deploy as usual
+```
+
+Or with your bundler (webpack, esbuild, etc.):
+
+```javascript
+// Build config example
+const timestamp = new Date().toISOString();
+const builtAtDefine = `var BUILT_AT = '${timestamp}';`;
+// Pass to your bundler's define/replace plugin
+```
+
+**Why:** This ensures every deployed version has an accurate timestamp. Partners can then check `getBuiltAt()` to see how stale their cached script is, making cache diagnostics much clearer.
 
 ---
 
