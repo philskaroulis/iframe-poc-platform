@@ -20,7 +20,7 @@
  */
 
 (function() {
-    var VERSION = '2.0.0';
+    var VERSION = '1.0.0';
     var MESSAGE_SOURCE = 'browser-event-relay';
     var LOG_SOURCE = '[' + MESSAGE_SOURCE + '] ';
 
