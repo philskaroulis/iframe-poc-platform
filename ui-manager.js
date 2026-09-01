@@ -20,6 +20,7 @@
     const header = document.querySelector('header');
     const statusText = document.querySelector('.status-text');
     const countdown = document.querySelector('.countdown');
+    const iframeContainer = document.querySelector('.iframe-container');
 
     function formatTime(date) {
         return date.toLocaleTimeString('en-US', {
@@ -50,6 +51,10 @@
         header.classList.add(ACTIVE_CLASS);
         statusText.textContent = 'ACTIVE';
 
+        if (iframeContainer) {
+            iframeContainer.classList.add(ACTIVE_CLASS);
+        }
+
         countdown.classList.remove('disabled');
         lastActivityTime = new Date();
 
@@ -69,6 +74,10 @@
         header.classList.remove(ACTIVE_CLASS);
         header.classList.add(INACTIVE_CLASS);
         statusText.textContent = 'INACTIVE';
+
+        if (iframeContainer) {
+            iframeContainer.classList.remove(ACTIVE_CLASS);
+        }
 
         countdown.classList.add('disabled');
 
@@ -143,6 +152,10 @@
             statusText.textContent = 'INACTIVE';
             countdown.classList.add('disabled');
             countdown.textContent = 'Seconds to INACTIVE: --s';
+        }
+
+        if (iframeContainer) {
+            iframeContainer.classList.remove(ACTIVE_CLASS);
         }
 
         initialized = false;

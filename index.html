@@ -7,9 +7,9 @@
     <link rel="stylesheet" href="styles.css">
 </head>
 <body>
-    <header>
+    <header class="inactive">
         <div class="status-text">INACTIVE</div>
-        <div class="countdown">Seconds to INACTIVE: --s</div>
+        <div class="countdown disabled">Seconds to INACTIVE: --s</div>
     </header>
 
     <div class="container">
@@ -22,12 +22,15 @@
 
         <!-- The iframe that will detect user events -->
         <!-- referrerpolicy="strict-origin" sends the platform's origin to the partner (enables referrer-based trust) -->
-        <iframe
-            id="activity-iframe"
-            title="Partner content iframe for browser event relaying"
-            sandbox="allow-scripts"
-            referrerpolicy="strict-origin"
-        ></iframe>
+        <div class="iframe-container">
+            <h3 class="iframe-label">🔗 Partner Content <span class="label-badge">Activity Monitored</span></h3>
+            <iframe
+                id="activity-iframe"
+                title="Partner content iframe for browser event relaying"
+                sandbox="allow-scripts"
+                referrerpolicy="strict-origin"
+            ></iframe>
+        </div>
 
         <div class="info-section">
             <h2>How This Works</h2>
