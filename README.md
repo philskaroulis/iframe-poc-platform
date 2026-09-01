@@ -1,6 +1,6 @@
 # iframe-poc-platform
 
-**Part of a two-repo platform/partner `postMessage` POC.** This repo simulates a **platform** that embeds third-party partner content in a cross-origin iframe and monitors user activity inside it. The partner repo (`iframe-poc-partner`) contains the embedded content and is required to load this platform's `oreilly-browser-event-relay.js` event relay script by reference.
+**Part of a two-repo platform/partner `postMessage` POC.** This repo simulates a **platform** that embeds third-party partner content in a cross-origin iframe and monitors user activity inside it. The partner repo (`iframe-poc-partner`) contains the embedded content and is required to load this platform's `browser-event-relay.js` event relay script by reference.
 
 ## Architecture
 
@@ -55,12 +55,12 @@
    - Enforces rate limiting via circuit breaker (max 100 events/sec)
    - Routes validated events to registered handlers
    - Updates UI state via `UIManager`
-5. **`oreilly-browser-event-relay.js`** — the **event relay script that partners are required to embed**. See below.
+5. **`browser-event-relay.js`** — the **event relay script that partners are required to embed**. See below.
 6. **`env-config.js`** — resolves the partner's URL/origin per environment (dev vs. prod).
 
 ### The Event Relay Script
 
-**`oreilly-browser-event-relay.js`** (production: `.min.js`) is **hosted and distributed by this platform repo**. Partners must load it via `<script src>` in their embedded content (see `iframe-poc-partner` for an example).
+**`browser-event-relay.js`** (production: `.min.js`) is **hosted and distributed by this platform repo**. Partners must load it via `<script src>` in their embedded content (see `iframe-poc-partner` for an example).
 
 The script:
 - Detects user activity inside the iframe (click, keypress, scroll, mousemove, visibility change)
@@ -68,7 +68,7 @@ The script:
 - Sends minimal, focused messages via `window.parent.postMessage()`:
   ```javascript
   {
-    source: "oreilly-browser-event-relay",
+    source: "browser-event-relay",
     type: "RELAYED_CLICK",    // or RELAYED_KEYPRESS, RELAYED_SCROLL, etc.
     timestamp: 1691743200000
   }
@@ -84,7 +84,7 @@ To prevent cross-contamination between multiple iframes on the same page, each i
 
 1. **Platform generates token** — `index.html` creates a `crypto.randomUUID()` for each iframe
 2. **Token passed to iframe** — Added as URL parameter: `?iframeId=<uuid>`
-3. **Relay script reads token** — `oreilly-browser-event-relay.js` extracts `iframeId` from URL
+3. **Relay script reads token** — `browser-event-relay.js` extracts `iframeId` from URL
 4. **Token included in messages** — Every activity message includes `iframeId` field
 5. **Platform validates token** — `fake-usage-meter.js` verifies `event.data.iframeId` matches expected value
 
@@ -112,7 +112,7 @@ The partner iframe sends messages in this exact format:
 
 The platform validates **every** incoming message via a strict multi-layer check:
 
-1. **Message source** — only messages with `source: "oreilly-browser-event-relay"` are processed
+1. **Message source** — only messages with `source: "browser-event-relay"` are processed
 2. **Relay token** — message `iframeId` must match the expected iframe's token (ensures isolation between iframes)
 3. **Timestamp deviation** — events with timestamps >5 seconds off the current time are rejected (detects clock-skew or malicious timestamps)
 4. **Event type** — only types starting with `RELAYED_` are accepted
@@ -190,7 +190,7 @@ window.UsageMeter.setDebug(true);
 
 Output example:
 ```
-[Usage Meter] Message received: {source: "oreilly-browser-event-relay", type: "RELAYED_CLICK", timestamp: 1691743200000}
+[Usage Meter] Message received: {source: "browser-event-relay", type: "RELAYED_CLICK", timestamp: 1691743200000}
 [Usage Meter] User clicked inside iframe {timestamp: 1691743200000}
 ```
 
@@ -315,8 +315,8 @@ Works in all modern browsers supporting:
 | `ui-manager.js` | Activity state management, countdown timer, header styling |
 | `fake-usage-meter.js` | Message handling, validation, security, rate limiting, event routing |
 | `styles.css` | Styling for platform page |
-| `oreilly-browser-event-relay.js` | Tracking script (unminified, for development) |
-| `oreilly-browser-event-relay.min.js` | Tracking script (minified, for production distribution) |
+| `browser-event-relay.js` | Tracking script (unminified, for development) |
+| `browser-event-relay.min.js` | Tracking script (minified, for production distribution) |
 | `env-config.js` | Environment detection and partner URL/origin resolution |
 | `PARTNER_INTEGRATION.md` | How partners integrate the platform's event relay script |
 | `SPA_INTEGRATION.md` | How platform SPAs manage lifecycle to prevent memory leaks |
@@ -347,11 +347,11 @@ window.UsageMeter.setDebug(true);
 If no messages appear:
 - Confirm partner script loaded (check `window.BrowserEventRelay`)
 - Confirm partner script is the right version (check `window.BrowserEventRelay.getVersion()`)
-- Confirm partner is sending messages (check partner iframe's console for `[oreilly-browser-event-relay]` messages)
+- Confirm partner is sending messages (check partner iframe's console for `[browser-event-relay]` messages)
 
 ### "Cannot read properties of null" or referrer/frameElement errors
 
-**Old code detected.** This repo previously used `window.frameElement.dataset.parentOrigin` which is `null` for cross-origin iframes. If you're using an old version of `oreilly-browser-event-relay.js`, regenerate from source in this repo — the fix is to derive origin from `document.referrer` instead.
+**Old code detected.** This repo previously used `window.frameElement.dataset.parentOrigin` which is `null` for cross-origin iframes. If you're using an old version of `browser-event-relay.js`, regenerate from source in this repo — the fix is to derive origin from `document.referrer` instead.
 
 ### Header not changing color
 

@@ -9,10 +9,10 @@
         try {
             PARENT_ORIGIN = new URL(document.referrer).origin;
         } catch (e) {
-            console.error('[oreilly-browser-event-relay] Failed to parse referrer:', e);
+            console.error('[browser-event-relay] Failed to parse referrer:', e);
         }
     }
-    var MESSAGE_SOURCE = 'oreilly-browser-event-relay';
+    var MESSAGE_SOURCE = 'browser-event-relay';
     var LOG_SOURCE = '[' + MESSAGE_SOURCE + '] ';
 
     // Retrieve iframe ID from URL parameters

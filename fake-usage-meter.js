@@ -13,7 +13,7 @@
 
     // ============ CONFIGURATION ============
     const CONFIG = {
-        MESSAGE_SOURCE: 'oreilly-browser-event-relay',
+        MESSAGE_SOURCE: 'browser-event-relay',
         PARTNER_ORIGIN: window.EnvConfig ? window.EnvConfig.get('PARTNER_ORIGIN') : 'https://philskaroulis.github.io',
         DEBUG: false,
         MAX_EVENTS_PER_SECOND: 100,
