@@ -29,8 +29,8 @@
     //
     // In production, replace BUILT_AT with timestamp from build process.
     // Example: `node -e "console.log(new Date().toISOString())"`
-    var VERSION = '2.0.0';
-    var BUILT_AT = '2025-01-09T14:30:00Z';
+    var VERSION = '1.0.0';
+    var BUILT_AT = '2026-09-01T15:00:00Z';
     var MESSAGE_SOURCE = 'browser-event-relay';
     var LOG_SOURCE = '[' + MESSAGE_SOURCE + '] ';
     var DEBUG = false;
