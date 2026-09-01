@@ -298,13 +298,19 @@ document.head.appendChild(script);
 
 ## Cross-Browser Compatibility
 
-The messenger uses:
-- ✓ `addEventListener()` / `removeEventListener()` — IE9+, all modern browsers
-- ✓ `window.parent.postMessage()` — IE8+, all modern browsers
-- ✓ `passive: true` option — modern browsers (gracefully ignored in older browsers)
-- ✓ ES5 syntax (no ES6) — works in IE9+
+**Minimum Browser Versions:**
+- ✓ **IE 9+** (2011)
+- ✓ **Chrome 32+** (Dec 2013)
+- ✓ **Safari 10+** (Sep 2016)
+- ✓ **Firefox 26+** (Apr 2014)
 
-**Minimum requirements:** IE9 or equivalent
+**Implementation:**
+- Manual URL parsing (instead of `new URL()`) — IE9+ compatible
+- Manual query string parsing (instead of `URLSearchParams`) — IE9+ compatible
+- ES5 syntax (no ES6 features like arrow functions, const/let, destructuring)
+- No passive event listener option (IE doesn't support addEventListener options object)
+
+All techniques are intentionally vintage to maximize compatibility without polyfills.
 
 ---
 

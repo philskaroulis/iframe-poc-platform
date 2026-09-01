@@ -1,30 +1,91 @@
-// Partner Browser Event Relay - Detects and relays browser events to platform
-// Supports lifecycle management to prevent memory leaks in partner apps
+/*
+ * Browser Event Relay - Detects and relays browser events to platform parent
+ * Supports lifecycle management to prevent memory leaks in partner apps
+ *
+ * BROWSER COMPATIBILITY:
+ * Result: Works on IE9+, Chrome 32+, Safari 10+, Firefox 26+ (no polyfills needed)
+ *
+ * | Browser | Min Version | Release Date |
+ * |---------|-------------|--------------|
+ * | IE      | 9+          | 2011         |
+ * | Chrome  | 32+         | Dec 2013     |
+ * | Safari  | 10+         | Sep 2016     |
+ * | Firefox | 26+         | Apr 2014     |
+ *
+ * COMPATIBILITY NOTES FOR DEVELOPERS:
+ *
+ * This script intentionally uses older JavaScript APIs to maximize compatibility.
+ * IE compatibility logic is isolated in dedicated functions below (see section markers).
+ * This makes it easy to modernize when IE support is no longer needed.
+ */
+
 (function() {
     var VERSION = '2.0.0';
-    // Derive trusted parent origin from document.referrer (works cross-origin)
-    // Referrer is set by platform's referrerpolicy="strict-origin" iframe attribute
-    var PARENT_ORIGIN = null;
-    if (document.referrer) {
-        try {
-            PARENT_ORIGIN = new URL(document.referrer).origin;
-        } catch (e) {
-            console.error('[browser-event-relay] Failed to parse referrer:', e);
-        }
-    }
     var MESSAGE_SOURCE = 'browser-event-relay';
     var LOG_SOURCE = '[' + MESSAGE_SOURCE + '] ';
 
-    // Retrieve iframe ID from URL parameters
-    var IFRAME_ID = null;
-    try {
-        var urlParams = new URLSearchParams(window.location.search);
-        IFRAME_ID = urlParams.get('iframeId');
-        if (IFRAME_ID) {
-            console.log(LOG_SOURCE + 'Iframe ID initialized:', IFRAME_ID);
+    // ============ IE COMPATIBILITY: URL PARSING ============
+    // This section handles browser incompatibilities with modern URL APIs
+    // When dropping IE support: replace with new URL(referrer).origin
+
+    /**
+     * IE COMPATIBILITY: Extract origin from referrer string
+     *
+     * Why: new URL() constructor not supported in IE
+     * Alternative: new URL(referrer).origin (Chrome 32+, Safari 10.1+, Firefox 26+)
+     *
+     * @param {string} referrer - The document.referrer string
+     * @returns {string|null} The origin (e.g., "https://example.com") or null if invalid
+     */
+    function parseOriginFromReferrer(referrer) {
+        try {
+            // Regex matches "https://example.com" from full URL
+            // Pattern: protocol (http/https) + :// + domain (up to next /)
+            var match = referrer.match(/^https?:\/\/[^\/]+/);
+            return match ? match[0] : null;
+        } catch (e) {
+            console.error(LOG_SOURCE + 'Failed to parse referrer origin:', e);
+            return null;
         }
-    } catch (e) {
-        console.warn(LOG_SOURCE + 'Failed to parse iframe ID from URL:', e);
+    }
+
+    /**
+     * IE COMPATIBILITY: Extract query parameter from URL
+     *
+     * Why: URLSearchParams API not supported in IE, Chrome <49, Safari <11.1
+     * Alternative: new URLSearchParams(location.search).get(name)
+     *
+     * @param {string} paramName - The parameter name to retrieve
+     * @returns {string|null} The parameter value (URL-decoded) or null if not found
+     */
+    function getUrlParameter(paramName) {
+        try {
+            // Remove leading '?' and split by '&' to get individual parameters
+            var params = window.location.search.substring(1).split('&');
+            for (var i = 0; i < params.length; i++) {
+                var pair = params[i].split('=');
+                // Decode both key and value to handle URL-encoded characters
+                if (decodeURIComponent(pair[0]) === paramName) {
+                    return pair[1] ? decodeURIComponent(pair[1]) : '';
+                }
+            }
+            return null;
+        } catch (e) {
+            console.warn(LOG_SOURCE + 'Failed to extract URL parameter:', e);
+            return null;
+        }
+    }
+
+    // ============ INITIALIZATION ============
+
+    // Derive trusted parent origin from document.referrer (works cross-origin)
+    // Referrer is set by platform's referrerpolicy="strict-origin" iframe attribute
+    var PARENT_ORIGIN = parseOriginFromReferrer(document.referrer);
+
+    // Retrieve iframe ID from URL parameters (relay token for iframe isolation)
+    var IFRAME_ID = getUrlParameter('iframeId');
+    if (IFRAME_ID) {
+        console.log(LOG_SOURCE + 'Iframe ID initialized:', IFRAME_ID);
     }
 
     // Lifecycle state
@@ -63,8 +124,8 @@
         };
     }
 
-    // ============ NAMED HANDLER FUNCTIONS ============
-    // These are stored by reference so they can be removed
+    // ============ EVENT HANDLER FUNCTIONS ============
+    // These are stored by reference so they can be removed during cleanup
     function handleClick() {
         sendMessageToParent('RELAYED_CLICK');
     }
@@ -81,6 +142,37 @@
         sendMessageToParent('RELAYED_MOUSEMOVE');
     }, 500);
 
+    // ============ IE COMPATIBILITY: EVENT LISTENERS ============
+    // addEventListener/removeEventListener called without options object
+    // When dropping IE support: add { passive: true } back for scroll performance
+
+    /**
+     * IE COMPATIBILITY: Add event listener without options
+     *
+     * Why: IE doesn't support options object in addEventListener()
+     * Modern approach: addEventListener(event, handler, { passive: true })
+     * This version: addEventListener(event, handler) - IE9+ compatible
+     *
+     * Trade-off: Modern browsers still optimize internally, but won't
+     * explicitly suppress default behavior for scroll events (IE never did anyway)
+     */
+    function addListenerWithoutOptions(target, eventName, handler) {
+        target.addEventListener(eventName, handler);
+        // Store listener info for cleanup (without options object)
+        listeners[eventName] = { target: target, handler: handler };
+    }
+
+    /**
+     * IE COMPATIBILITY: Remove event listener without options
+     *
+     * Why: removeEventListener() called with only 2 params (IE compatible)
+     * vs. 3 params with options object (modern browsers)
+     */
+    function removeListenerWithoutOptions(target, eventName, handler) {
+        // IE9+ doesn't require the options parameter, so we omit it
+        target.removeEventListener(eventName, handler);
+    }
+
     // ============ LIFECYCLE MANAGEMENT ============
     function init() {
         if (initialized) {
@@ -88,21 +180,11 @@
             return;
         }
 
-        // Register click listener
-        window.addEventListener('click', handleClick, { passive: true });
-        listeners.click = { target: window, handler: handleClick, options: { passive: true } };
-
-        // Register keydown listener
-        window.addEventListener('keydown', handleKeydown, { passive: true });
-        listeners.keydown = { target: window, handler: handleKeydown, options: { passive: true } };
-
-        // Register scroll listener (throttled)
-        window.addEventListener('scroll', handleScroll, { passive: true });
-        listeners.scroll = { target: window, handler: handleScroll, options: { passive: true } };
-
-        // Register mousemove listener (throttled)
-        window.addEventListener('mousemove', handleMousemove, { passive: true });
-        listeners.mousemove = { target: window, handler: handleMousemove, options: { passive: true } };
+        // Register event listeners (without options for IE compatibility)
+        addListenerWithoutOptions(window, 'click', handleClick);
+        addListenerWithoutOptions(window, 'keydown', handleKeydown);
+        addListenerWithoutOptions(window, 'scroll', handleScroll);
+        addListenerWithoutOptions(window, 'mousemove', handleMousemove);
 
         initialized = true;
         console.log(LOG_SOURCE + 'Initialized and listening for events');
@@ -136,7 +218,7 @@
         for (var i = 0; i < eventNames.length; i++) {
             var eventName = eventNames[i];
             var listener = listeners[eventName];
-            listener.target.removeEventListener(eventName, listener.handler, listener.options);
+            removeListenerWithoutOptions(listener.target, eventName, listener.handler);
         }
 
         // Clear listener references

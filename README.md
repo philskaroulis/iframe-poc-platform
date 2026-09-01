@@ -301,11 +301,32 @@ Partner content is deployed separately (see `iframe-poc-partner` README). Platfo
 
 ## Browser Compatibility
 
-Works in all modern browsers supporting:
-- `postMessage()` API
-- ES6 (arrow functions, destructuring, const/let)
-- `requestAnimationFrame()`
-- `Document.referrer` (cross-origin readable when `Referrer-Policy` allows)
+### Minimum Supported Versions
+
+| Browser | Min Version | Release Date | Status |
+|---------|-------------|--------------|--------|
+| **Internet Explorer** | 9 | 2011 | ✓ Full support (no passive events) |
+| **Chrome** | 32 | Dec 2013 | ✓ Full support |
+| **Safari** | 10 | Sep 2016 | ✓ Full support |
+| **Firefox** | 26 | Apr 2014 | ✓ Full support |
+
+### Implementation Notes
+
+The **`browser-event-relay.js`** script intentionally uses compatible JavaScript patterns to support IE9+:
+
+- **Manual URL parsing** (instead of `new URL()`) — supports IE9+
+- **Manual query string parsing** (instead of `URLSearchParams`) — supports IE9+
+- **No passive event listeners** (IE doesn't support options object) — graceful degradation
+
+See script header comments for detailed explanations of each compatibility measure and trade-offs.
+
+### Core Platform Pages
+
+**Other platform files** use modern JavaScript (const/let, arrow functions, ES6):
+- `ui-manager.js` — requires modern browsers (ES6+)
+- `fake-usage-meter.js` — requires modern browsers (ES6+)
+
+The browser-event-relay script is intentionally conservative to maximize partner reach.
 
 ## Files
 
