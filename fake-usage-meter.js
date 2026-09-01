@@ -200,8 +200,11 @@
                 warn(`No handler registered for event type: ${type}`);
             }
 
-            // 11. Update UI state
-            if (window.UIManager) {
+            // 11. Update UI state (only for user activity, not lifecycle messages)
+            const isUserActivity = type.startsWith('RELAYED_') &&
+                                   !type.includes('INIT') &&
+                                   !type.includes('CLEANUP');
+            if (isUserActivity && window.UIManager) {
                 window.UIManager.setActive();
             }
 
