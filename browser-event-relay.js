@@ -20,7 +20,11 @@
  */
 
 (function() {
-    var VERSION = '1.0.0';
+    // VERSION exposed via getVersion() API for cache debugging.
+    // Partners' browsers cache this script; when platform deploys updates,
+    // cached versions may persist for hours/days. getVersion() helps diagnose
+    // "is the partner on the old or new code?" during troubleshooting.
+    var VERSION = '2.0.0';
     var MESSAGE_SOURCE = 'browser-event-relay';
     var LOG_SOURCE = '[' + MESSAGE_SOURCE + '] ';
 
