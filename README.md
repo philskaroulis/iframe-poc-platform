@@ -63,17 +63,20 @@
 **`browser-event-relay.js`** (production: `.min.js`) is **hosted and distributed by this platform repo**. Partners must load it via `<script src>` in their embedded content (see `iframe-poc-partner` for an example).
 
 The script:
-- Detects user activity inside the iframe (click, keypress, scroll, mousemove, visibility change)
+- Detects user activity inside the iframe (click, keypress, scroll, mousemove)
 - Derives the trusted parent (platform) origin from `document.referrer` (read by browser, available cross-origin if platform iframe has `referrerpolicy="strict-origin"`)
 - Sends minimal, focused messages via `window.parent.postMessage()`:
   ```javascript
   {
     source: "browser-event-relay",
     type: "RELAYED_CLICK",    // or RELAYED_KEYPRESS, RELAYED_SCROLL, etc.
-    timestamp: 1691743200000
+    timestamp: 1691743200000,
+    iframeId: "abc-123..."    // Unique identifier for iframe isolation
   }
   ```
+  For lifecycle events (RELAYED_INIT, RELAYED_CLEANUP), also includes: `version` and `builtAt`
 - Supports lifecycle management (`init()`, `cleanup()`, `isInitialized()`) for SPAs.
+- Provides diagnostic API (`version()` returns {version, builtAt}, `setDebug()` for debug logging).
 - Auto-initializes on load but can be manually managed for partners running single-page apps.
 
 See **[PARTNER_INTEGRATION.md](PARTNER_INTEGRATION.md)** for how partners integrate this script into their own content.
@@ -105,7 +108,7 @@ The partner iframe sends messages in this exact format:
 | Keypress | `RELAYED_KEYPRESS` | None | Sent on every keydown |
 | Scroll | `RELAYED_SCROLL` | 200ms | Throttled to 5 events/sec max |
 | Mouse move | `RELAYED_MOUSEMOVE` | 500ms | Throttled to 2 events/sec max |
-| Relay init | `RELAYED_INIT` | None | Sent when relay script binds to events |
+| Relay init | `RELAYED_INIT` | None | Sent when relay script binds to events; includes `version` and `builtAt` |
 | Relay cleanup | `RELAYED_CLEANUP` | None | Sent when relay script unbinds from events |
 
 ## Security & Validation

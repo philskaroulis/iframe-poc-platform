@@ -517,7 +517,7 @@ const builtAtDefine = `var BUILT_AT = '${timestamp}';`;
 // Pass to your bundler's define/replace plugin
 ```
 
-**Why:** This ensures every deployed version has an accurate timestamp. Partners can then check `getBuiltAt()` to see how stale their cached script is, making cache diagnostics much clearer.
+**Why:** This ensures every deployed version has an accurate timestamp. Partners can then check `window.BrowserEventRelay.version().builtAt` to see how stale their cached script is, making cache diagnostics much clearer.
 
 ---
 
@@ -545,7 +545,12 @@ All techniques are intentionally vintage to maximize compatibility without polyf
 - [ ] **You load the relay script:** `<script src="https://...browser-event-relay.min.js"></script>`
 - [ ] **Script auto-initializes** — nothing to do, events are relayed automatically
 - [ ] **For SPAs:** Only call `cleanup()` if your entire app is unloaded; don't cleanup on route changes
-- [ ] **Verify it works:** Open browser console inside your iframe, run `window.BrowserEventRelay.isInitialized()`
+- [ ] **Verify it works:** Open browser console inside your iframe, run:
+  ```javascript
+  window.BrowserEventRelay.isInitialized()  // Should be true
+  window.BrowserEventRelay.version()        // Shows { version, builtAt }
+  ```
+- [ ] **(Optional) Enable debugging:** `window.BrowserEventRelay.setDebug(true)` to see relay activity in console
 
 ---
 
@@ -556,7 +561,8 @@ All techniques are intentionally vintage to maximize compatibility without polyf
 | **Setup** | Load the relay script; auto-initializes on load (no config needed) |
 | **Events tracked** | Click, keydown, scroll (200ms throttle), mousemove (500ms throttle) |
 | **Lifecycle** | Auto-init on load, auto-cleanup on page unload; SPAs should avoid manual cleanup unless fully unloading |
-| **API** | `init()`, `cleanup()`, `isInitialized()`, `getVersion()` |
+| **API** | `init()`, `cleanup()`, `isInitialized()`, `version()` (returns {version, builtAt}), `setDebug(enabled)` |
+| **Debugging** | Silent by default; use `setDebug(true)` to see relay activity in console; errors always logged |
 | **Security** | Script derives parent origin from `document.referrer` (requires `referrerpolicy="strict-origin"` on iframe) |
 
 That's it! The relay script handles all the complexity of detecting activity and safely reporting it to the platform.
